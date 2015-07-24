@@ -1,0 +1,22 @@
+#main{
+	width:90%;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top: 2vmax;
+}
+
+#mapContainer{
+	float:left;
+	width:60%;
+	height:30vw;
+	
+	box-shadow: 0 0 5px #888888;
+}
+
+#chartContainer{
+	float:right;
+	width: 38%;
+	height:30vw;
+	
+	box-shadow: 0 0 5px #888888;
+}

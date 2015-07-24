@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+<title>Turkey Survey Charts</title>
+<script src="libraries/d3.v3.min.js"></script>
+<script src="libraries/topojson.v1.min.js"></script>
+<script src="libraries/queue.v1.min.js"></script>
+<script src="libraries/d3.tip.v0.6.3.js"></script>
+<link rel="stylesheet" href="libraries/tool-tip-style.css">
+<link rel="stylesheet" href="libraries/main.css">
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<style>
+
+</style>
+</head>
+
+<body>
+	<div id="main">
+		<div id="mapContainer"></div>
+		<div id="chartContainer"></div>
+	</div>
+</body>
+
+<script>
+queue()
+	.defer(d3.json, "maps/euroMap.json") //the zone map
+	.await(ready);
+
+function ready(error, euroMap){
+	drawMap(euroMap)
+}
+
+function drawMap(euroMap){
+	//CREATING THE CANVAS
+	var containerSize = d3.select('#mapContainer').node().getBoundingClientRect()
+  	var mapMargin = {top: 0.008*containerSize.height , right: 0.008*containerSize.width, bottom: 0.008*containerSize.height, left: 0.008*containerSize.width};
+  	var mapWidth = containerSize.width - mapMargin.right - mapMargin.left; //Chart width
+  	var mapHeight = containerSize.height - mapMargin.top - mapMargin.bottom; //Chart height
+
+  	var map = d3.select('#mapContainer').append('svg') //http://bl.ocks.org/mbostock/3019563
+        .attr({
+          height: mapHeight + mapMargin.top + mapMargin.bottom,
+          width: mapWidth + mapMargin.left + mapMargin.right
+        })
+        .attr("id", "mapSvg")
+      	.attr("transform", "translate(" + (mapMargin.left) + "," + (mapMargin.top)+ ")")//moving the origin to the point where it starts
+      	//.call(makeResponsiveMap)
+
+	//GETTING THE MAP DATA READY
+	var mapFeatures = topojson.feature(euroMap, euroMap.objects.NUTS_RG_01M_2013).features
+	console.log(mapFeatures)
+
+	//SETTING THE MAP PROJECTION AND PATH
+	var mapProjection = d3.geo.conicEqualArea()
+		.scale(d3.min([2.5*mapWidth,2*mapHeight]))
+		.translate([0.2*mapWidth, 2.5*mapHeight])
+
+	var mapPath = d3.geo.path()
+		.projection(mapProjection)
+
+	//DRAWING THE MAP
+	var euroMap = map.append('g').selectAll('.euroMap') //the large map with zone boundaries
+		.data(mapFeatures)
+		.enter()
+		.append('path')
+		.attr({
+			d: mapPath,
+			'class': 'euroMap',
+			fill: "#DFDFDF",
+		});
+
+	//DRAWING BOUNDARIES
+	console.log(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013))
+	// map.append("path") //the zonal boundaries
+	// 	.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b ; }))
+	// 	.attr({
+	// 		d: mapPath,
+	// 		class: 'zone-boundary'
+	// 	});
+
+}
+
+
+</script>
+</html>
