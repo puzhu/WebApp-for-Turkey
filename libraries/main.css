@@ -20,3 +20,40 @@
 	
 	box-shadow: 0 0 5px #888888;
 }
+
+
+
+
+
+.country-boundary{
+	fill:none;
+	stroke: green; /*rgb(160,160,160);*/
+	stroke-width:2px;
+	stroke-linejoin:round;
+	stroke-linecap:round;
+}
+
+.nuts1-boundary{
+	fill:none;
+	stroke:blue;/*rgb(60,60,60);*/
+	stroke-width:1.2px;
+	stroke-linejoin:round;
+	stroke-linecap:round;
+}
+
+.nuts2-boundary{
+	fill:none;
+	stroke:red; /*rgb(60,60,60);*/
+	stroke-width:0.8px;
+	stroke-linejoin:round;
+	stroke-linecap:round;
+}
+
+.nuts3-boundary{
+	fill:none;
+	stroke:grey; /*rgb(60,60,60);*/
+	stroke-width:0.2px;
+	stroke-linejoin:round;
+	stroke-linecap:round;
+}
+

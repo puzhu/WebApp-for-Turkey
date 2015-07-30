@@ -49,7 +49,7 @@ function drawMap(euroMap){
 
 	//GETTING THE MAP DATA READY
 	var mapFeatures = topojson.feature(euroMap, euroMap.objects.NUTS_RG_01M_2013).features
-	console.log(mapFeatures)
+	console.log(mapFeatures.filter(function(d){return d.properties.STAT_LEVL_ === 0}))
 
 	//SETTING THE MAP PROJECTION AND PATH
 	var mapProjection = d3.geo.conicEqualArea()
@@ -60,7 +60,7 @@ function drawMap(euroMap){
 		.projection(mapProjection)
 
 	//DRAWING THE MAP
-	var euroMap = map.append('g').selectAll('.euroMap') //the large map with zone boundaries
+	var euroMap1 = map.append('g').selectAll('.euroMap') //the large map with zone boundaries
 		.data(mapFeatures)
 		.enter()
 		.append('path')
@@ -70,15 +70,35 @@ function drawMap(euroMap){
 			fill: "#DFDFDF",
 		});
 
-	//DRAWING BOUNDARIES
-	console.log(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013))
-	// map.append("path") //the zonal boundaries
-	// 	.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b ; }))
-	// 	.attr({
-	// 		d: mapPath,
-	// 		class: 'zone-boundary'
-	// 	});
+		//turkey map .style create a function if d.id = AT_~
 
+	//DRAWING BOUNDARIES
+	map.append("path") //the zonal boundaries
+		.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b && a.properties.STAT_LEVL_ === 0 }))
+		.attr({
+			d: mapPath,
+			class: 'country-boundary'
+		});
+	map.append("path") //the zonal boundaries
+		.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b && a.properties.STAT_LEVL_ === 1 }))
+		.attr({
+			d: mapPath,
+			class: 'nuts1-boundary'
+		});
+
+	map.append("path") //the zonal boundaries
+		.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b && a.properties.STAT_LEVL_ === 2 }))
+		.attr({
+			d: mapPath,
+			class: 'nuts2-boundary'
+		});
+
+	map.append("path") //the zonal boundaries
+		.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b && a.properties.STAT_LEVL_ === 3 }))
+		.attr({
+			d: mapPath,
+			class: 'nuts3-boundary'
+		});
 }
 
 
