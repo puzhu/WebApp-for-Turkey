@@ -6,6 +6,7 @@
 <script src="libraries/d3.v3.min.js"></script>
 <script src="libraries/topojson.v1.min.js"></script>
 <script src="libraries/queue.v1.min.js"></script>
+<script src="libraries/jquery-1.8.3.min.js"></script>
 <script src="libraries/d3.tip.v0.6.3.js"></script>
 <link rel="stylesheet" href="libraries/tool-tip-style.css">
 <link rel="stylesheet" href="libraries/main.css">
@@ -17,21 +18,38 @@
 
 <body>
 	<div id="main">
+		<div class='controls'>
+			<form action="">
+				<input type="radio" name="mapLevel" value=1>Nuts 1
+				<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
+				<input type="radio" name="mapLevel" value=3>Nuts 3
+			</form>
+		</div>
 		<div id="mapContainer"></div>
 		<div id="chartContainer"></div>
 	</div>
 </body>
 
 <script>
+
+
+//LISTENING TO THE RADIO BUTTON TO REGISTER NEW MAP VALUES AND CHANGE THE DATA QUEUE ND DRAWING THE MAP
+
+
+
 queue()
-	.defer(d3.json, "maps/euroMap.json") //the zone map
+	.defer(d3.json, "maps/nuts1.json") //the zone map
+	.defer(d3.json, "maps/nuts2.json")
+	.defer(d3.json, "maps/nuts3.json")
+	.defer(d3.csv, "data/nutsData.csv")
 	.await(ready);
 
-function ready(error, euroMap){
-	drawMap(euroMap)
+function ready(error, mapFile1, mapFile2, mapFile3, nutsData){
+	drawMap(mapFile1, mapFile2, mapFile3, nutsData)
 }
 
-function drawMap(euroMap){
+
+function drawMap(mapFile1, mapFile2, mapFile3, nutsData){
 	//CREATING THE CANVAS
 	var containerSize = d3.select('#mapContainer').node().getBoundingClientRect()
   	var mapMargin = {top: 0.008*containerSize.height , right: 0.008*containerSize.width, bottom: 0.008*containerSize.height, left: 0.008*containerSize.width};
@@ -48,57 +66,75 @@ function drawMap(euroMap){
       	//.call(makeResponsiveMap)
 
 	//GETTING THE MAP DATA READY
-	var mapFeatures = topojson.feature(euroMap, euroMap.objects.NUTS_RG_01M_2013).features
-	console.log(mapFeatures.filter(function(d){return d.properties.STAT_LEVL_ === 0}))
+	var nutsLevel = Number($("input[type='radio'][name='mapLevel']:checked").val())
+	var mapFile = mapFile2
+	
+	var mapKey = Object.keys(mapFile.objects)//Pulls out the key associated with the map features
+	var mapFeatures = topojson.feature(mapFile, mapFile.objects[mapKey]).features
+	//console.log(mapFeatures)
 
 	//SETTING THE MAP PROJECTION AND PATH
-	var mapProjection = d3.geo.conicEqualArea()
-		.scale(d3.min([2.5*mapWidth,2*mapHeight]))
-		.translate([0.2*mapWidth, 2.5*mapHeight])
+	var mapProjection = d3.geo.mercator()
+		.scale(800) //(d3.min([2.5*mapWidth,2*mapHeight]))
+		.translate([-0.15*mapWidth, 4.15*mapHeight])
 
 	var mapPath = d3.geo.path()
 		.projection(mapProjection)
 
 	//DRAWING THE MAP
-	var euroMap1 = map.append('g').selectAll('.euroMap') //the large map with zone boundaries
+	var turkeyMap = map.append('g').selectAll('.turkeyMap') //the large map with zone boundaries
 		.data(mapFeatures)
 		.enter()
 		.append('path')
 		.attr({
 			d: mapPath,
-			'class': 'euroMap',
+			'class': 'turkeyMap',
 			fill: "#DFDFDF",
 		});
 
 		//turkey map .style create a function if d.id = AT_~
 
 	//DRAWING BOUNDARIES
-	map.append("path") //the zonal boundaries
-		.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b && a.properties.STAT_LEVL_ === 0 }))
+	var internalBoundaries = map.append("path") //the zonal boundaries
+		.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a !== b}))
 		.attr({
 			d: mapPath,
 			class: 'country-boundary'
 		});
-	map.append("path") //the zonal boundaries
-		.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b && a.properties.STAT_LEVL_ === 1 }))
-		.attr({
-			d: mapPath,
-			class: 'nuts1-boundary'
-		});
 
-	map.append("path") //the zonal boundaries
-		.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b && a.properties.STAT_LEVL_ === 2 }))
-		.attr({
-			d: mapPath,
-			class: 'nuts2-boundary'
-		});
+	//LISTEN TO THE RADIO BUTTON AND REDRAW MAP BASED ON CLICKS
+	$('input:radio').on('click', function(e) {
+		if(e.currentTarget.name === "mapLevel"){
+			var nutsLevel = Number(e.currentTarget.value);
+			console.log(nutsLevel)
+			//$( "#mapContainer" ).empty()
+			if (nutsLevel === 1) {
+				mapFile = mapFile1
+			} else if (nutsLevel === 2) {
+				mapFile = mapFile2
+			} else {
+				mapFile = mapFile3
+			}
+		}
+		redrawMap(mapFile, nutsData)
 
-	map.append("path") //the zonal boundaries
-		.datum(topojson.mesh(euroMap, euroMap.objects.NUTS_RG_01M_2013, function(a, b) { return a !== b && a.properties.STAT_LEVL_ === 3 }))
-		.attr({
-			d: mapPath,
-			class: 'nuts3-boundary'
-		});
+	});
+	function redrawMap(mapFile, nutsData){
+		
+		mapKey = Object.keys(mapFile.objects)
+		mapFeatures = topojson.feature(mapFile, mapFile.objects[mapKey]).features
+		
+
+		turkeyMap.data(mapFeatures)
+
+		internalBoundaries.remove()
+		internalBoundaries.append('path')
+		internalBoundaries.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a !== b}))
+		internalBoundaries.attr({
+				d: mapPath,
+				class: 'country-boundary'
+			});
+	}
 }
 
 

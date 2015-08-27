@@ -1,0 +1,3 @@
+ogr2ogr nuts1New.shp nuts_level1.shp -t_srs "+proj=longlat +ellps=WGS84 +no_defs +towgs84=0,0,0"
+
+topojson -o nuts1.json --simplify-proportion .05 -p -- nuts1New.shp;
