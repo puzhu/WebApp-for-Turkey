@@ -123,12 +123,11 @@ function drawMap(mapFile1, mapFile2, mapFile3, nutsData){
 		
 		mapKey = Object.keys(mapFile.objects)
 		mapFeatures = topojson.feature(mapFile, mapFile.objects[mapKey]).features
-		
 
 		turkeyMap.data(mapFeatures)
 
 		internalBoundaries.remove()
-		internalBoundaries.append('path')
+		internalBoundaries = map.append('path')
 		internalBoundaries.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a !== b}))
 		internalBoundaries.attr({
 				d: mapPath,
