@@ -1,0 +1,112 @@
+"","topic","indicator","indicatorID"
+"1","Corruption","Bribery incidence (percent of firms experiencing at least one bribe payment request)",5
+"2","Corruption","Bribery depth (% of public transactions where a gift or informal payment was requested)",4
+"3","Corruption","Percent of firms expected to give gifts in meetings with tax officials",35
+"4","Corruption","Percent of firms expected to give gifts to secure government contract",42
+"5","Corruption","Value of gift expected to secure a government contract (% of contract value)",110
+"6","Corruption","Percent of firms expected to give gifts to get an operating license",40
+"7","Corruption","Percent of firms expected to give gifts to get an import license",39
+"8","Corruption","Percent of firms expected to give gifts to get a construction permit",36
+"9","Corruption","Percent of firms expected to give gifts to get an electrical connection",38
+"10","Corruption","Percent of firms expected to give gifts to get a water connection",37
+"11","Corruption","Percent of firms expected to give gifts to public officials ""to get things done""",41
+"12","Corruption","Percent of firms identifying corruption as a major constraint",51
+"13","Corruption","Percent of firms identifying the courts system as a major constraint",59
+"14","Crime","Percent of firms paying for security",64
+"15","Crime","Security costs (% of annual sales)",107
+"16","Crime","If the establishment pays for security, average security costs (% of annual sales)",16
+"17","Crime","Percent of firms experiencing losses due to theft and vandalism",43
+"18","Crime","Losses due to theft and vandalism against the firm (% of annual sales)",22
+"19","Crime","If there were losses, average losses due to theft and vandalism (% of annual sales)",17
+"20","Crime","Products shipped to supply domestic markets that were lost due to theft (% of product value)*",82
+"21","Crime","Percent of firms identifying crime, theft and disorder as a major constraint",52
+"22","Finance","Percent of firms with a checking or savings account",72
+"23","Finance","Percent of firms with a bank loan/line of credit",71
+"24","Finance","Proportion of loans requiring collateral (%)",90
+"25","Finance","Value of collateral needed for a loan (% of the loan amount)",109
+"26","Finance","Percent of firms not needing a loan",61
+"27","Finance","Percent of firms whose recent loan application was rejected",70
+"28","Finance","Percent of firms using banks to finance investments",65
+"29","Finance","Proportion of investments financed internally (%)",89
+"30","Finance","Proportion of investments financed by banks (%)",86
+"31","Finance","Proportion of investments financed by supplier credit (%)",88
+"32","Finance","Proportion of investments financed by equity or stock sales (%)",87
+"33","Finance","Percent of firms using banks to finance working capital",66
+"34","Finance","Proportion of working capital financed by banks (%)",104
+"35","Finance","Proportion of working capital financed by supplier credit (%)",105
+"36","Finance","Percent of firms identifying access to finance as a major constraint",48
+"37","Firm Characteristics","Age of the establishment (years)",1
+"38","Firm Characteristics","Proportion of private domestic ownership in a firm (%)",94
+"39","Firm Characteristics","Proportion of private foreign ownership in a firm (%)",95
+"40","Firm Characteristics","Proportion of government/state ownership in a firm (%)",85
+"41","Firm Characteristics","Proportion of a firm held by the largest owner(s) (%)",83
+"42","Firm Characteristics","Percent of firms with legal status of publicly listed company",80
+"43","Firm Characteristics","Percent of firms with legal status of privately held Limited Liability Company",79
+"44","Firm Characteristics","Percent of firms with legal status of Sole Proprietorship",81
+"45","Firm Characteristics","Percent of firms with legal status of Partnership",78
+"46","Firm Characteristics","Percent of firms with legal status of Limited Partnership",77
+"47","Gender","Percent of firms with female participation in ownership",76
+"48","Gender","Percent of firms with a female top manager",73
+"49","Gender","Proportion of permanent full-time workers that are female (%)",93
+"50","Gender","Proportion of permanent full-time production workers that are female (%)*",92
+"51","Gender","Proportion of permanent full-time non-production workers that are female (%)*",91
+"52","Informality","Percent of firms competing against unregistered or informal firms",34
+"53","Informality","Percent of firms formally registered when they started operations in the country",46
+"54","Informality","Number of years firm operated without formal registration",32
+"55","Informality","Percent of firms identifying practices of competitors in the informal sector as a major constraint",56
+"56","Infrastructure","Number of electrical outages in a typical month",23
+"57","Infrastructure","Duration of a typical electrical outage (hours)",14
+"58","Infrastructure","If there were outages, average duration of a typical electrical outage (hours)",18
+"59","Infrastructure","Losses due to electrical outages (% of annual sales)",21
+"60","Infrastructure","If there were outages, average losses due to electrical outages (% of annual sales)",19
+"61","Infrastructure","Percent of firms owning or sharing a generator",63
+"62","Infrastructure","Proportion of electricity from a generator (%)",84
+"63","Infrastructure","If a generator is used, average proportion of electricity from a generator (%)",15
+"64","Infrastructure","Days to obtain an electrical connection (upon application)",11
+"65","Infrastructure","Percent of firms identifying electricity as a major constraint",54
+"66","Infrastructure","Number of water insufficiencies in a typical month*",31
+"67","Infrastructure","Proportion of products lost to breakage or spoilage during shipping to domestic markets (%)*",96
+"68","Infrastructure","Percent of firms identifying transportation as a major constraint",60
+"69","Innovation and Technology","Percent of firms with an internationally-recognized quality certification",75
+"70","Innovation and Technology","Percent of firms using technology licensed from foreign companies*",69
+"71","Innovation and Technology","Percent of firms having their own Web site",47
+"72","Innovation and Technology","Percent of firms using e-mail to interact with clients/suppliers",67
+"73","Innovation and Technology","Percent of firms with an annual financial statement reviewed by external auditors",74
+"74","Performance","Capacity utilization (%)*",6
+"75","Performance","Real annual sales growth (%)",106
+"76","Performance","Annual employment growth (%)",2
+"77","Performance","Annual labor productivity growth (%)",3
+"78","Performance","Percent of firms buying fixed assets",33
+"79","Regulations and Taxes","Senior management time spent dealing with the requirements of government regulation (%)",108
+"80","Regulations and Taxes","Number of visits or required meetings with tax officials",30
+"81","Regulations and Taxes","If there were visits, average number of visits or required meetings with tax officials",20
+"82","Regulations and Taxes","Days to obtain an operating license",13
+"83","Regulations and Taxes","Days to obtain a construction-related permit",10
+"84","Regulations and Taxes","Days to obtain an import license",12
+"85","Regulations and Taxes","Percent of firms identifying tax rates as a major constraint",58
+"86","Regulations and Taxes","Percent of firms identifying tax administration as a major constraint",57
+"87","Regulations and Taxes","Percent of firms identifying business licensing and permits as a major constraint",50
+"88","Trade","Days to clear direct exports through customs",8
+"89","Trade","Percent of firms exporting directly or indirectly (at least 1% of sales)",45
+"90","Trade","Percent of firms exporting directly (at least 1% of sales)",44
+"91","Trade","Proportion of total sales that are domestic sales (%)",99
+"92","Trade","Proportion of total sales that are exported directly (%)",100
+"93","Trade","Proportion of total sales that are exported indirectly (%)",101
+"94","Trade","Days to clear imports from customs*",9
+"95","Trade","Percent of firms using material inputs and/or supplies of foreign origin*",68
+"96","Trade","Proportion of total inputs that are of domestic origin (%)*",97
+"97","Trade","Proportion of total inputs that are of foreign origin (%)*",98
+"98","Trade","Days of inventory of main input*",7
+"99","Trade","Percent of firms identifying customs and trade regulations as a major constraint",53
+"100","Workforce","Percent of firms offering formal training",62
+"101","Workforce","Proportion of workers offered formal training (%)*",103
+"102","Workforce","Years of the top manager's experience working in the firm's sector",111
+"103","Workforce","Number of permanent full-time workers",24
+"104","Workforce","Number of temporary workers",29
+"105","Workforce","Number of permanent production workers*",26
+"106","Workforce","Number of permanent non-production workers*",25
+"107","Workforce","Number of permanent skilled production workers*",27
+"108","Workforce","Number of permanent unskilled production workers*",28
+"109","Workforce","Proportion of unskilled workers (out of all production workers) (%)*",102
+"110","Workforce","Percent of firms identifying labor regulations as a major constraint",55
+"111","Workforce","Percent of firms identifying an inadequately educated workforce as a major constraint",49

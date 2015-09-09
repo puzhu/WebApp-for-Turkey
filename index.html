@@ -19,6 +19,9 @@
 <body>
 	<div id="main">
 		<div class='controls'>
+			<div id = "dropDown">
+				<select id= "indicatorList"></select>
+			</div>
 			<form action="">
 				<input type="radio" name="mapLevel" value=1>Nuts 1
 				<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
@@ -33,14 +36,14 @@
 <script>
 
 //DATA PROCESSING FUNCTIONS
-function processData(data) {
-	function deString(d) {
-		if (d==="") {
-			return NaN;
-		} else {
-			return +d;
-		}
+function deString(d) {
+	if (d==="") {
+		return NaN;
+	} else {
+		return +d;
 	}
+}
+function processData(data) {
 	var array = {
 		regionCode: data.regionCode,
 		groupID: deString(data.groupID),
@@ -51,17 +54,18 @@ function processData(data) {
 	return array
 }
 function processGroups(data) {
-	function deString(d) {
-		if (d==="") {
-			return NaN;
-		} else {
-			return +d;
-		}
-	}
 	var array = {
 		mainGroup: data.mainGroup,
 		groupID: deString(data.groupID),
 		subGroup: data.subGroup
+	}
+	return array
+}
+function processIndicators(data) {
+	var array = {
+		topic: data.topic,
+		indicator: data.indicator,
+		indicatorID: deString(data.indicatorID)
 	}
 	return array
 }
@@ -96,16 +100,18 @@ queue()
 	.defer(d3.json, "maps/nuts3.json")
 	.defer(d3.csv, "data/nutsData.csv", processData)
 	.defer(d3.csv, "data/groups.csv", processGroups)
+	.defer(d3.csv, "data/indicators.csv", processIndicators)
 	.await(ready);
 
-function ready(error, mapFile1, mapFile2, mapFile3, nutsData, groups){
-	drawMap(mapFile1, mapFile2, mapFile3, nutsData)
-	drawPanel(nutsData, groups)
+function ready(error, mapFile1, mapFile2, mapFile3, nutsData, groups, indicators){
+	draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators)
 }
 
+function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 
-function drawMap(mapFile1, mapFile2, mapFile3, nutsData, groups){
-	//THE FUNCTION THAT ADDS THE INDICATOR DATA TO THE MAP
+											//FIRST WE DRAW THE MAPS
+	//HELPER FUNCTIONs
+	//TO ADD INDICATOR DATA TO THE MAP
 	function addInditoMap(data, mapFeatures) {
 		for (i = 0; i < data.length; i++) {
 			var value = data[i].value;
@@ -116,9 +122,32 @@ function drawMap(mapFile1, mapFile2, mapFile3, nutsData, groups){
 		}
 		return mapFeatures;
 	}
+	//TO FILTER DATA DURING TRIGGER EVENTS
+	function dataFilter(nutsData, mapOrPanel) {//group is set to 2 for initial draw at national level for map hover/click select the appropriate regional id
+    	var sel = document.getElementById('indicatorList'); //selecting the default based on current input
+    	var currentIndicator = deString(sel.options[sel.selectedIndex].value)
+   		var nutsLevel = Number($("input[type='radio'][name='mapLevel']:checked").val())
+   		if (mapOrPanel) { //for map we need all the nuts regions data at the aggregated grouping
+   			return nutsData.filter(function(d) { return d.indicatorID === currentIndicator && d.regionCode.length === (nutsLevel + 2) && d.groupID === 2})
+   		} else {// for panel we want disaggregated groups (so not 2) for one particular region selection with defaul of national
+   			return nutsData.filter(function(d) { return d.indicatorID === currentIndicator && d.groupID !== 2})
+   		}
+   		
+    }
+
+	//CREATE THE INDICATOR LIST TO POPULATE THE DROPDOWN MENU BASED ON CURRENT TAB
+		//TO-DO: Create an onclick event for clicks on new tabs to redraw the selection for indicators.
+	var indicatorList = indicators.filter(function(d) {return d.topic === "Corruption"}) //topic is hardcoded currently, should be base on tab selected
+	var select = d3.select('#indicatorList')
+	select.selectAll('options')
+		.data(indicatorList)
+		.enter()
+		.append('option')
+		.attr('value', function(d) {return d.indicatorID})
+		.text(function(d) {return d.indicator})
 
 
-	//CREATING THE CANVAS
+	//CREATE THE CANVAS
 	var mapContainerSize = d3.select('#mapContainer').node().getBoundingClientRect()
   	var mapMargin = {top: 0.008 * mapContainerSize.height , right: 0.008 * mapContainerSize.width, bottom: 0.008 * mapContainerSize.height, left: 0.008 * mapContainerSize.width};
   	var mapWidth = mapContainerSize.width - mapMargin.right - mapMargin.left; //Chart width
@@ -133,15 +162,11 @@ function drawMap(mapFile1, mapFile2, mapFile3, nutsData, groups){
       	.attr("transform", "translate(" + (mapMargin.left) + "," + (mapMargin.top)+ ")")//moving the origin to the point where it starts
       	//.call(makeResponsiveMap)
 
-    //GET THE DATA READY
-    var indicator = 4
-    var group = 2
-    var nutsLevel = Number($("input[type='radio'][name='mapLevel']:checked").val())
-    var filteredData = nutsData.filter(function(d) {return d.indicatorID === indicator && d.regionCode.length === (nutsLevel + 2) && d.groupID === group})
+    //SET THE DOMAINS AND RANGES
+    var filteredData = dataFilter(nutsData, true) //mapOrPanel is set to trues
 
 	var max = d3.max(filteredData, function(d) { return d.value; });
 	var min = d3.min(filteredData, function(d) { return d.value; });
-
 	var bounds = setBins(max,min);
 
 	var colorArray = ['rgb(255,51,51)','rgb(200,30,100)','rgb(130,15,150)','rgb(60,5,200)','rgb(0,0,255)'];
@@ -152,13 +177,10 @@ function drawMap(mapFile1, mapFile2, mapFile3, nutsData, groups){
 		.range(colorArray);
 
 	//GETTING THE MAP DATA READY
-	var mapFile = mapFile2
+	var mapFile = mapFile2 //hardoded to use the nuts2 level as the default
 	var mapKey = Object.keys(mapFile.objects)//Pulls out the key associated with the map features
 	var mapFeatures = topojson.feature(mapFile, mapFile.objects[mapKey]).features
-	// var test3 = uniq_fast(mapFeatures.map(function (d) {return d.LEVEL2_COD}))
-	// var test2 = mapFeatures.filter(function (d) {return d.LEVEL2_COD === test[0]})
 	mapFeatures = addInditoMap(filteredData, mapFeatures)
-	console.log(mapFeatures)
 
 	//SETTING THE MAP PROJECTION AND PATH
 	var mapProjection = d3.geo.mercator()
@@ -177,7 +199,9 @@ function drawMap(mapFile1, mapFile2, mapFile3, nutsData, groups){
 			d: mapPath,
 			'class': 'turkeyMap',
 			fill: function (d) {return color(d.properties.value)}
-		});
+		})
+		.on('mouseover', mouseoverRegion)
+		.on('mouseout', mouseoutRegion);
 
 		//turkey map .style create a function if d.id = AT_~
 
@@ -189,26 +213,10 @@ function drawMap(mapFile1, mapFile2, mapFile3, nutsData, groups){
 			class: 'country-boundary'
 		});
 
-	//LISTEN TO THE RADIO BUTTON AND REDRAW MAP BASED ON CLICKS
-	$('input:radio').on('click', function(e) {
-		if(e.currentTarget.name === "mapLevel"){
-			var nutsLevel = Number(e.currentTarget.value);
-			console.log(nutsLevel)
-			//$( "#mapContainer" ).empty()
-			if (nutsLevel === 1) {
-				mapFile = mapFile1
-			} else if (nutsLevel === 2) {
-				mapFile = mapFile2
-			} else {
-				mapFile = mapFile3
-			}
-		}
-		redrawMapNUTS(mapFile, nutsData)
-
-	});
+	//REDRAW FUNCTION
+		//To-Do: Create a single function that responds to all the trigger events
 	function redrawMapNUTS(mapFile, nutsData){
-		var nutsLevel = Number($("input[type='radio'][name='mapLevel']:checked").val())
-		filteredData = nutsData.filter(function(d) {return d.indicatorID === indicator && d.regionCode.length === (nutsLevel + 2) && d.groupID === group})
+		filteredData = dataFilter(nutsData, true)
 		//var test = uniq_fast(filteredData.map(function (d) {return d.regionCode})).sort()
 		max = d3.max(filteredData, function(d) { return d.value; });
 		min = d3.min(filteredData, function(d) { return d.value; });
@@ -242,15 +250,16 @@ function drawMap(mapFile1, mapFile2, mapFile3, nutsData, groups){
 				class: 'country-boundary'
 			});
 	}
-}
 
-function drawPanel(nutsData, groups) {
+
+
+											//THE NEXT SECTION DRAWS THE SIDE PANEL
 	//HELPER FUNCTION FOR GETTING DATA INTO GROUPS
-	function groupData(nutsData, groups, indicator, region) {
-		var data = nutsData.filter(function (d) {return d.indicatorID === indicator && d.regionCode === region})
+	function groupData(nutsData, groups, region) { //region specifies the regional specification for the groups (so national or a particular hovered/clicked region)
+		var data = dataFilter(nutsData, false)
 		var array = []
 		groups.forEach(function(d) {
-			var value = data.filter(function(e){return e.groupID === d.groupID})[0].value
+			var value = data.filter(function(e){return e.groupID === d.groupID && e.regionCode === region})[0].value
 			array.push({
 				mainGroup: d.mainGroup,
 				subGroup: d.subGroup,
@@ -258,15 +267,15 @@ function drawPanel(nutsData, groups) {
 			})
 		})
 		return array
-	}
-
-	//GET THE DATA READY
-	var indicator = 4 //this is changed only when the indicator is changed
-	var region = 'TR' //the initial selection is for the country since thats the default representation
-	var groupedData = groupData(nutsData, groups, indicator, region)
-	console.log(groupedData)
+	};
+	
+	//console.log(dataFilter(nutsData, false))
+	//GET THE DATA INTO THE DIFFERENT GROUPS (HORIZ LINES) FOR THE SIDE PANEL
+	var defaultRegion = "TR"
+	var groupedData = groupData(nutsData, groups, defaultRegion); //the default region is set to national ("TR") for panel view
+	
 	//GET THE CANVAS READY
-	var panelContainerSize = d3.select('#panelContainer').node().getBoundingClientRect()
+	var panelContainerSize = d3.select('#panelContainer').node().getBoundingClientRect();
   	var panelMargin = {top: 0.008 * panelContainerSize.height , right: 0.08 * panelContainerSize.width, bottom: 0.008 * panelContainerSize.height, left: 0.008 * panelContainerSize.width};
   	var panelWidth = panelContainerSize.width - panelMargin.right - panelMargin.left; //Chart width
   	var panelHeight = panelContainerSize.height - panelMargin.top - panelMargin.bottom; //Chart height
@@ -277,7 +286,7 @@ function drawPanel(nutsData, groups) {
           width: panelWidth + panelMargin.left + panelMargin.right
         })
         .attr("id", "panelSvg")
-      	.attr("transform", "translate(" + (panelMargin.left) + "," + (panelMargin.top)+ ")")//moving the origin to the point where it starts
+      	.attr("transform", "translate(" + (panelMargin.left) + "," + (panelMargin.top)+ ")");//moving the origin to the point where it starts
       	//.call(makeResponsiveMap)
 
     //GET THE SCALES AND CHARTING FUNCTIONS READY
@@ -285,12 +294,12 @@ function drawPanel(nutsData, groups) {
     var minValue = d3.min(groupedData, function(d) {return d.value})
     var xScale = d3.scale.linear() //the xScale is set based on the values of the indicator
     	.domain([maxValue, minValue])
-    	.range([0, panelWidth])
+    	.range([0, panelWidth]);
 
    	var yDomain = uniq_fast(groups.map(function(d) {return d.mainGroup}))
     var yScale = d3.scale.ordinal() //based on the number of mainGroups in the groups csv
     	.domain(yDomain)
-    	.rangeBands([60, panelHeight], 0.1) //the range band fixes a margin of 60 for the first line
+    	.rangeBands([60, panelHeight], 0.1); //the range band fixes a margin of 60 for the first line
 
     //DRAW ELEMENTS ON THE PANEL
     var horizontalLines = panel.append('g')//thin lines to act as guides for the dots
@@ -304,7 +313,7 @@ function drawPanel(nutsData, groups) {
     		x2: xScale(maxValue),
     		y2: function(d) {return yScale(d)}
     	})
-    	.style('stroke', 'black')
+    	.style('stroke', 'black');
 
     var circles = panel.append('g')// dots of equal radius based on the value of the indicator placed based on the grouping
     	.selectAll('.dots')
@@ -315,11 +324,62 @@ function drawPanel(nutsData, groups) {
     		cx: function(d) {return xScale(d.value)},
     		cy: function(d) {return yScale(d.mainGroup)},
     		r: 5
-    	})
-    
+    	});
+
+    //REDRAW FUNCTION FOR THE PANEL
+    function redrawPanel(nutsData, groups, region){
+    	groupedData = groupData(nutsData, groups, region)
+    	maxValue = d3.max(groupedData, function(d) {return d.value})
+    	minValue = d3.min(groupedData, function(d) {return d.value})
+    	xScale.domain([maxValue, minValue])
+
+    	circles = circles.data(groupedData)
+    	circles.exit().remove()
+    	circles.enter().append('circle')
+    	circles.attr({
+    		cx: function(d) {return xScale(d.value)},
+    		cy: function(d) {return yScale(d.mainGroup)},
+    		r: 5
+    	});
+    }
 
 
+
+    									//LISTENERS FOR DIFFERENT TRIGGER EVENTS
+	//1. CLICK ON THE RADIO BUTTONS: ONLY AFFECTS MAPS SINCE PANEL IS AFFECTED ONLY BY HOVER OR CLICK EVENTS ON MAP
+	$('input:radio').on('click', function(e) {
+		var nutsLevel = Number($("input[type='radio'][name='mapLevel']:checked").val())
+		if (nutsLevel === 1) {
+			mapFile = mapFile1
+		} else if (nutsLevel === 2) {
+			mapFile = mapFile2
+		} else {
+			mapFile = mapFile3
+		}
+		redrawMapNUTS(mapFile, nutsData)
+	});
+
+	//2. A NEW INDICATOR SELECTION AFFECTS BOTH MAP AND PANEL
+	d3.select('#indicatorList').on('change.line', function(d) {
+		redrawMapNUTS(mapFile, nutsData);
+		redrawPanel(nutsData, groups, defaultRegion) //region is reset to the national level (so clicked or hovered regions are wiped)
+    });
+
+	//3. MOUSE-HOVER ON REGION
+	function mouseoverRegion(d) {
+		var hoverRegion = d.properties.adminLevel;
+		redrawPanel(nutsData, groups, hoverRegion)
+	}
+
+	function mouseoutRegion(d) {
+		redrawPanel(nutsData, groups, defaultRegion)
+	}
+
+	function onClickRegion(d) {
+		
+	}
 }
+
 
 
 </script>

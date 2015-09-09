@@ -1,0 +1,19 @@
+"","mainGroup","subGroup","groupID"
+"1","Business Sector","Food",7
+"2","Business Sector","Textiles and Wearing Apparel",15
+"3","Business Sector","Construction",3
+"4","Business Sector","Fabricated metal , Machinery and Motor vehicles",6
+"5","Business Sector","Other Manufacturing",12
+"6","Business Sector","Wholesale and Retail",19
+"7","Business Sector","Transport",18
+"8","Business Sector","Other Services",13
+"9","Firm Size","Micro",10
+"10","Firm Size","Small",14
+"11","Firm Size","Medium",9
+"12","Firm Size","Large",8
+"13","Exporting Status","Direct exports are 10% or more of sales",4
+"14","Exporting Status","Non-exporter",11
+"15","Gender of Top Manager","Top manager is female",16
+"16","Gender of Top Manager","Top manager is male",17
+"17","Ownership","Domestic",5
+"18","Ownership","10% or more foreign ownership",1

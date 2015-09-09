@@ -10,6 +10,12 @@
 	height: 30px;
 	box-shadow: 0 0 5px #888888;
 }
+select{
+	float: left;
+}
+form{
+	float: left;
+}
 
 #mapContainer{
 	float:left;
@@ -18,7 +24,7 @@
 	box-shadow: 0 0 5px #888888;
 }
 
-#chartContainer{
+#panelContainer{
 	float:right;
 	width: 38%;
 	height:30vw;
