@@ -211,6 +211,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 	mapFeatures = addInditoMap(filteredData, mapFeatures)
 
 	//SETTING THE MAP PROJECTION AND PATH
+		//To-Do: Get the projection right with the new size
 	var mapProjection = d3.geo.mercator()
 		.scale(400) //(d3.min([2.5*mapWidth,2*mapHeight]))
 		.translate([-0.15*mapWidth, 4.15*mapHeight])
@@ -357,6 +358,23 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
     		class: 'symbols'
     	})
     	.style('font-size', function(d) {return d.fontSize + "px"});
+
+    //PREVENTING SYMBOL OVERLAP http://stackoverflow.com/questions/19681724/how-to-avoid-labels-overlapping-in-a-d3-js-pie-chart
+    	//To-Do: This is not funcitonal yet. Make it
+    var prev;
+	symbols.each(function(d, i) {
+	  if(i > 0) {
+	    var thisbb = this.getBoundingClientRect(),
+	        prevbb = prev.getBoundingClientRect();
+	    // move if they overlap
+	    if(!(thisbb.right < prevbb.left || thisbb.left > prevbb.right) && thisbb.bottom === prevbb.bottom) {//the if condition checks if the two symbols are on the same line and overlap
+	        var cx = 
+	        d3.select(this).attr("transform", "translate(" + cx + "," + 0 + ")");
+	    }
+	  }
+	  prev = this;
+	});
+
 
     //DRAW LABELS
     	//To-Do: Fix label positioning and styling in CSS
