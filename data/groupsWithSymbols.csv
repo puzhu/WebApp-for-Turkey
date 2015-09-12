@@ -1,0 +1,19 @@
+,mainGroup,subGroup,groupID,symbols,fontSize
+1,Business Sector,Food,7,&#xf0f5,16
+2,Business Sector,Textiles and Wearing Apparel,15,&#xf132,16
+3,Business Sector,Construction,3,&#xf1ad,16
+4,Business Sector,"Fabricated metal , Machinery and Motor vehicles",6,&#xf085,16
+5,Business Sector,Other Manufacturing,12,&#xf1b3,16
+6,Business Sector,Wholesale and Retail,19,&#xf06b,16
+7,Business Sector,Transport,18,&#xf238,16
+8,Business Sector,Other Services,13,&#xf0ad,16
+9,Firm Size,Micro,10,&#xf275,9
+10,Firm Size,Small,14,&#xf275,14
+11,Firm Size,Medium,9,&#xf275,19
+12,Firm Size,Large,8,&#xf275,24
+13,Exporting Status,Direct exports are 10% or more of sales,4,&#xf08e,16
+14,Exporting Status,Non-exporter,11,&#xf23e,16
+15,Gender of Top Manager,Top manager is female,16,&#xf182,16
+16,Gender of Top Manager,Top manager is male,17,&#xf183,16
+17,Ownership,Domestic,5,&#xf276,16
+18,Ownership,10% or more foreign ownership,1,&#xf1d9,16

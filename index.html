@@ -10,6 +10,7 @@
 <script src="libraries/d3.tip.v0.6.3.js"></script>
 <link rel="stylesheet" href="libraries/tool-tip-style.css">
 <link rel="stylesheet" href="libraries/main.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 <script src="http://d3js.org/topojson.v1.min.js"></script>
 <style>
 
@@ -36,13 +37,6 @@
 <script>
 
 //DATA PROCESSING FUNCTIONS
-function deString(d) {
-	if (d==="") {
-		return NaN;
-	} else {
-		return +d;
-	}
-}
 function processData(data) {
 	var array = {
 		regionCode: data.regionCode,
@@ -57,7 +51,9 @@ function processGroups(data) {
 	var array = {
 		mainGroup: data.mainGroup,
 		groupID: deString(data.groupID),
-		subGroup: data.subGroup
+		subGroup: data.subGroup,
+		symbol: data.symbols,
+		fontSize: data.fontSize
 	}
 	return array
 }
@@ -70,7 +66,38 @@ function processIndicators(data) {
 	return array
 }
 
-
+//HELPER FUNCTIONS
+function deString(d) {
+	if (d==="") {
+		return NaN;
+	} else {
+		return +d;
+	}
+}
+function wrap(text, width) {
+	text.each(function() {
+	    var text = d3.select(this),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        lineNumber = 0, //<-- 0!
+        lineHeight = 1.2, // ems
+        x = text.attr("x"), //<-- include the x!
+        y = text.attr("y"),
+        dy = text.attr("dy") ? text.attr("dy") : 0; //<-- null check
+        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+            }
+        }
+    });
+}
 function setBins(max,min) {// calculates the bins for the color domain in the map
 	var bounds = [];
 	for (var i=1;i<=5;i++) { // create 5 equally sized bins between min*.95 and max*1.05
@@ -99,7 +126,7 @@ queue()
 	.defer(d3.json, "maps/nuts2.json")
 	.defer(d3.json, "maps/nuts3.json")
 	.defer(d3.csv, "data/nutsData.csv", processData)
-	.defer(d3.csv, "data/groups.csv", processGroups)
+	.defer(d3.csv, "data/groupsWithSymbols.csv", processGroups)
 	.defer(d3.csv, "data/indicators.csv", processIndicators)
 	.await(ready);
 
@@ -118,7 +145,8 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 			var regionCode = data[i].regionCode
 
 			var feature = mapFeatures.filter(function(d) { return d.properties.adminLevel === regionCode;})
-			if (feature.length > 0) {feature[0].properties.value = value}
+			if (feature.length > 0) {feature[0].properties.value = value;
+				feature[0].properties.active = false;}
 		}
 		return mapFeatures;
 	}
@@ -132,7 +160,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
    		} else {// for panel we want disaggregated groups (so not 2) for one particular region selection with defaul of national
    			return nutsData.filter(function(d) { return d.indicatorID === currentIndicator && d.groupID !== 2})
    		}
-   		
     }
 
 	//CREATE THE INDICATOR LIST TO POPULATE THE DROPDOWN MENU BASED ON CURRENT TAB
@@ -163,6 +190,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
       	//.call(makeResponsiveMap)
 
     //SET THE DOMAINS AND RANGES
+    	//To-Do: Come up with a better color range: http://christopheviau.com/d3list/gallery.html#visualizationType=choropleth
     var filteredData = dataFilter(nutsData, true) //mapOrPanel is set to trues
 
 	var max = d3.max(filteredData, function(d) { return d.value; });
@@ -184,7 +212,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 
 	//SETTING THE MAP PROJECTION AND PATH
 	var mapProjection = d3.geo.mercator()
-		.scale(800) //(d3.min([2.5*mapWidth,2*mapHeight]))
+		.scale(400) //(d3.min([2.5*mapWidth,2*mapHeight]))
 		.translate([-0.15*mapWidth, 4.15*mapHeight])
 
 	var mapPath = d3.geo.path()
@@ -201,16 +229,16 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 			fill: function (d) {return color(d.properties.value)}
 		})
 		.on('mouseover', mouseoverRegion)
-		.on('mouseout', mouseoutRegion);
-
-		//turkey map .style create a function if d.id = AT_~
+		.on('mouseout', mouseoutRegion)
+		//.on('click', onClickRegion);
 
 	//DRAWING BOUNDARIES
+		//To-Do: Different boundaries for different nuts levels 2. Country boundary 3. Active Boundary
 	var internalBoundaries = map.append("path") //the zonal boundaries
 		.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a !== b}))
 		.attr({
 			d: mapPath,
-			class: 'country-boundary'
+			class: 'nuts-boundary'
 		});
 
 	//REDRAW FUNCTION
@@ -226,9 +254,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 
 		mapKey = Object.keys(mapFile.objects)
 		mapFeatures = topojson.feature(mapFile, mapFile.objects[mapKey]).features
-
-		//var test2 = uniq_fast(mapFeatures.map(function (d) {return d.properties.adminLevel})).sort()
-		//console.log(test, test2)
 		mapFeatures = addInditoMap(filteredData, mapFeatures)
 
 		turkeyMap.remove()
@@ -240,14 +265,17 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 				d: mapPath,
 				'class': 'turkeyMap',
 				fill: function (d) {return color(d.properties.value)}
-			});
+			})
+			.on('mouseover', mouseoverRegion)
+			.on('mouseout', mouseoutRegion)
+			//.on('click', onClickRegion);
 
 		internalBoundaries.remove()
 		internalBoundaries = map.append('path')
 		internalBoundaries.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a !== b}))
 		internalBoundaries.attr({
 				d: mapPath,
-				class: 'country-boundary'
+				class: 'nuts-boundary'
 			});
 	}
 
@@ -263,20 +291,21 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 			array.push({
 				mainGroup: d.mainGroup,
 				subGroup: d.subGroup,
-				value: value
+				value: value,
+				symbol:d.symbol,
+				fontSize: d.fontSize
 			})
 		})
 		return array
 	};
-	
-	//console.log(dataFilter(nutsData, false))
+
 	//GET THE DATA INTO THE DIFFERENT GROUPS (HORIZ LINES) FOR THE SIDE PANEL
 	var defaultRegion = "TR"
 	var groupedData = groupData(nutsData, groups, defaultRegion); //the default region is set to national ("TR") for panel view
-	
+	console.log(groupedData)
 	//GET THE CANVAS READY
 	var panelContainerSize = d3.select('#panelContainer').node().getBoundingClientRect();
-  	var panelMargin = {top: 0.008 * panelContainerSize.height , right: 0.08 * panelContainerSize.width, bottom: 0.008 * panelContainerSize.height, left: 0.008 * panelContainerSize.width};
+  	var panelMargin = {top: 0.008 * panelContainerSize.height , right: 0.00008 * panelContainerSize.width, bottom: 0.008 * panelContainerSize.height, left: 0.15 * panelContainerSize.width};
   	var panelWidth = panelContainerSize.width - panelMargin.right - panelMargin.left; //Chart width
   	var panelHeight = panelContainerSize.height - panelMargin.top - panelMargin.bottom; //Chart height
 
@@ -293,8 +322,8 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
     var maxValue = d3.max(groupedData, function(d) {return d.value})
     var minValue = d3.min(groupedData, function(d) {return d.value})
     var xScale = d3.scale.linear() //the xScale is set based on the values of the indicator
-    	.domain([maxValue, minValue])
-    	.range([0, panelWidth]);
+    	.domain([minValue, maxValue])
+    	.range([panelMargin.left, panelWidth]);
 
    	var yDomain = uniq_fast(groups.map(function(d) {return d.mainGroup}))
     var yScale = d3.scale.ordinal() //based on the number of mainGroups in the groups csv
@@ -302,6 +331,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
     	.rangeBands([60, panelHeight], 0.1); //the range band fixes a margin of 60 for the first line
 
     //DRAW ELEMENTS ON THE PANEL
+    	//To-Do: explore if I can use images instead of dots
     var horizontalLines = panel.append('g')//thin lines to act as guides for the dots
     	.selectAll('.horizontalLines')
     	.data(yDomain)
@@ -311,36 +341,55 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
     		x1: xScale(minValue),
     		y1: function(d) {return yScale(d)},
     		x2: xScale(maxValue),
-    		y2: function(d) {return yScale(d)}
-    	})
-    	.style('stroke', 'black');
-
-    var circles = panel.append('g')// dots of equal radius based on the value of the indicator placed based on the grouping
-    	.selectAll('.dots')
-    	.data(groupedData)
-    	.enter()
-    	.append('circle')
-    	.attr({
-    		cx: function(d) {return xScale(d.value)},
-    		cy: function(d) {return yScale(d.mainGroup)},
-    		r: 5
+    		y2: function(d) {return yScale(d)},
+    		class: 'horizontalLines'
     	});
 
+    var symbols = panel.append('g')// dots of equal radius based on the value of the indicator placed based on the grouping
+    	.selectAll('.symbols')
+    	.data(groupedData)
+    	.enter()
+    	.append('text')
+    	.html(function(d) {return d.symbol})
+    	.attr({
+    		x: function(d) {return xScale(d.value)},
+    		y: function(d) {return yScale(d.mainGroup)},
+    		class: 'symbols'
+    	})
+    	.style('font-size', function(d) {return d.fontSize + "px"});
+
+    //DRAW LABELS
+    	//To-Do: Fix label positioning and styling in CSS
+    var yLabels = panel.append('g')
+    	.selectAll('.yLabels')
+    	.data(yDomain)
+    	.enter()
+    	.append('text')
+    	.text(function(d) {return d})
+    	.attr({
+    		x: xScale(minValue) - 90,
+    		y: function(d) {return yScale(d)},
+    		class: 'yLabels'
+    	})
+    	.call(wrap, 90)
+
     //REDRAW FUNCTION FOR THE PANEL
+    	//To-do: Implement a transition
     function redrawPanel(nutsData, groups, region){
     	groupedData = groupData(nutsData, groups, region)
     	maxValue = d3.max(groupedData, function(d) {return d.value})
     	minValue = d3.min(groupedData, function(d) {return d.value})
     	xScale.domain([maxValue, minValue])
 
-    	circles = circles.data(groupedData)
-    	circles.exit().remove()
-    	circles.enter().append('circle')
-    	circles.attr({
-    		cx: function(d) {return xScale(d.value)},
-    		cy: function(d) {return yScale(d.mainGroup)},
-    		r: 5
-    	});
+    	symbols = symbols.data(groupedData)
+    	symbols.exit().remove()
+    	symbols.enter().append('circle')
+    	symbols.attr({
+    		x: function(d) {return xScale(d.value)},
+    		y: function(d) {return yScale(d.mainGroup)},
+    		class: 'symbols'
+    	})
+    	.style('font-size', function(d) {return d.fontSize + "px"});
     }
 
 
@@ -366,18 +415,29 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
     });
 
 	//3. MOUSE-HOVER ON REGION
+		//To-Do: Implement a smooth boundary transition that is attractive
 	function mouseoverRegion(d) {
 		var hoverRegion = d.properties.adminLevel;
 		redrawPanel(nutsData, groups, hoverRegion)
 	}
-
 	function mouseoutRegion(d) {
 		redrawPanel(nutsData, groups, defaultRegion)
 	}
 
+	/*//4. MOUSE-CLICK ON REGION- implement only if necessary
+		//To-Do: Execute an efficient and elegant toggle mechanism for clicked regions
+	
 	function onClickRegion(d) {
-		
-	}
+		if(d.properties.active) { //if the state is already active then toggle to nont-active
+			d.properties.active = false;
+		} else {
+			d.properties.active = true;
+		}
+		console.log(d)
+	}*/
+
+	//5. PANEL DOT HOVER
+		//To-Do: Show the data for a particular grouping on the map
 }
 
 

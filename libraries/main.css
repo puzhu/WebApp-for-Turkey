@@ -19,52 +19,45 @@ form{
 
 #mapContainer{
 	float:left;
-	width:60%;
+	width:48%;
 	height:30vw;
-	box-shadow: 0 0 5px #888888;
+	/*box-shadow: 0 0 5px #888888;*/
 }
 
 #panelContainer{
 	float:right;
-	width: 38%;
+	width: 50%;
 	height:30vw;
-	
-	box-shadow: 0 0 5px #888888;
+	/*box-shadow: 0 0 5px #888888;*/
 }
 
 
 
 
-
-.country-boundary{
+/*Map CSS*/
+.nuts-boundary{
 	fill:none;
-	stroke: green; /*rgb(160,160,160);*/
-	stroke-width:2px;
+	stroke: white; /*rgb(160,160,160);*/
+	stroke-width:1px;
 	stroke-linejoin:round;
 	stroke-linecap:round;
 }
 
-.nuts1-boundary{
-	fill:none;
-	stroke:blue;/*rgb(60,60,60);*/
-	stroke-width:1.2px;
-	stroke-linejoin:round;
-	stroke-linecap:round;
+/*Panel CSS*/
+.horizontalLines{
+	stroke: grey;
+	stroke-width: 0.2px;
 }
+.dots{
+	fill: darkgrey;
+}
+.symbols {
+    font-family: FontAwesome;
+    opacity: 0.6;
+ }
 
-.nuts2-boundary{
-	fill:none;
-	stroke:red; /*rgb(60,60,60);*/
-	stroke-width:0.8px;
-	stroke-linejoin:round;
-	stroke-linecap:round;
-}
 
-.nuts3-boundary{
-	fill:none;
-	stroke:grey; /*rgb(60,60,60);*/
-	stroke-width:0.2px;
-	stroke-linejoin:round;
-	stroke-linecap:round;
-}
+
+
+
 
