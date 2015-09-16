@@ -8,13 +8,13 @@
 .controls{
 	width: 100%;
 	height: 30px;
-	box-shadow: 0 0 5px #888888;
+	/*box-shadow: 0 0 5px #888888;*/
 }
 select{
 	float: left;
 }
 form{
-	float: left;
+	float: right;
 }
 
 #mapContainer{
@@ -34,25 +34,48 @@ form{
 /*Map CSS*/
 .nuts-boundary{
 	fill:none;
-	stroke: white; /*rgb(160,160,160);*/
+	stroke: grey; /*rgb(160,160,160);*/
 	stroke-width:1px;
 	stroke-linejoin:round;
 	stroke-linecap:round;
 }
-
+.country-boundary{
+	fill:none;
+	stroke: black; /*rgb(160,160,160);*/
+	stroke-width:1px;
+	/*stroke-dasharray: 2,2;*/
+	stroke-linejoin:round;
+	stroke-linecap:round;
+}
 /*Panel CSS*/
-.horizontalLines{
-	stroke: grey;
-	stroke-width: 0.2px;
+.hLines{
+	stroke: lightgrey;
+	stroke-width: 0.4px;
 }
-.dots{
-	fill: darkgrey;
+
+.vLines{
+	stroke: lightgrey;
+	stroke-width: 0.4px;
 }
+
 .symbols {
     font-family: FontAwesome;
     opacity: 0.6;
  }
+ .xAxis path, .xAxis line{
+ 	fill:none;
+ 	stroke: lightgrey;
+ 	shape-rendering: crispEdges;
+ }
 
+ .xAxis text{
+ 	font-size: 12px;
+ 	font-family: sans-serif;
+ }
+
+.yLabels{
+	vertical-align: middle;
+}
 
 
 
