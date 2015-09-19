@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bar chart</title>
+  <style>
+
+  #labels text {
+    font-size:11px;
+    font-family:Arial;
+    text-anchor:end;
+    alignment-baseline:middle;
+  }
+
+  .catLabel {
+    font-size:14px;
+    font-family:Arial;
+  }
+  </style>
+</head>
+<body>
+  <div id="barChart">
+  </div>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script>
+
+    var data = [{'name':'Micro','value':19},{'name':'Small','value':90},{'name':'Medium','value':71},{'name':'Large','value':35}]
+
+    var margin = {'top':20}
+    var chartWidth = 200;
+    var chartHeight = 550;
+
+    var barHeight = 8;
+    var barGap = 5;
+
+    var labelWidth = 50;
+
+    var xscale = d3.scale.linear()
+            .domain([0,100])
+            .range([0,chartWidth]);
+
+    var yscale = d3.scale.linear()
+            .domain([0,data.length])
+            .range([0,chartHeight]);
+
+    var svg = d3.select('#barChart')
+            .append('svg')
+            .attr({'width':chartWidth,'height':chartHeight});
+
+    var chart = svg.append('g')
+
+    var catLabel  = chart.append('text')
+              .attr('class','catLabel')
+              .attr('x',5)
+              .attr('y',12)
+              .text('Firm Size');
+
+    var bars = chart.append('g')
+              .attr('id','bars')
+              .attr('transform','translate(50,'+margin.top+')')
+              .selectAll('rect')
+              .data(data)
+              .enter()
+              .append('rect')
+              .attr('height',barHeight)
+              .attr({'x':0,'y':function(d,i){ return i*(barHeight+barGap); }})
+              .style('fill','rgb(43,140,190)')
+              .attr('width',function(d){ return xscale(d.value); });
+
+    var labels = chart.append('g')
+              .attr('id','labels')
+              .attr('transform','translate(0,'+margin.top+')')
+              .attr('width',50)
+              .selectAll('text')
+              .data(data)
+              .enter()
+              .append('text')
+              .attr('x',labelWidth-5)
+              .attr('y', function(d,i){ return i*(barHeight+barGap)+(barHeight/2);})
+              .text(function(d) {return d.name})
+
+
+
+
+  </script>
+</body>
+</html>
