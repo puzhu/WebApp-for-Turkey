@@ -13,7 +13,6 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 <script src="http://d3js.org/topojson.v1.min.js"></script>
 <style>
-
 </style>
 </head>
 
@@ -220,8 +219,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 	//SETTING THE MAP PROJECTION AND PATH
 		//To-Do: Automatically center a map
 	var mapProjection = d3.geo.mercator()
-		.scale(1.2 * Math.max(mapWidth, mapHeight))
-		.translate([-mapWidth/5, 3.5*mapHeight]);
+		.center([19.5,71.2])
+		.scale(550)
+		.rotate([0,0,5.5])
+		.translate([mapWidth/2,mapHeight/2]);
 
 	var mapPath = d3.geo.path()
 		.projection(mapProjection)
