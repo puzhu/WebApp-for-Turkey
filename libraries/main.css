@@ -47,6 +47,11 @@ form{
 	stroke-linejoin:round;
 	stroke-linecap:round;
 }
+
+.legendLabels{
+	font-family: sans-serif;
+	font-size: 12px;
+}
 /*Panel CSS*/
 .hLines{
 	stroke: lightgrey;
@@ -74,7 +79,7 @@ form{
  }
 
 .yLabels{
-	vertical-align: middle;
+	/*vertical-align: middle;*/
 }
 
 
