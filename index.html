@@ -23,14 +23,18 @@
 			<div id = "dropDown">
 				<select id= "indicatorList"></select>
 			</div>
+		</div>
+		<div id="mapContainer"></div>
+		<div id="panelContainer"></div>
+		<div id="legendAndButtons">
+			<div id="legend"></div>
 			<form action="">
 				<input type="radio" name="mapLevel" value=1>Nuts 1
 				<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
 				<input type="radio" name="mapLevel" value=3>Nuts 3
 			</form>
 		</div>
-		<div id="mapContainer"></div>
-		<div id="panelContainer"></div>
+
 	</div>
 </body>
 
@@ -262,35 +266,40 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 			class: 'country-boundary'
 		});
 
-		console.log(color.range())
 	//DRAW MAP LEGEND
-	console.log(bounds)
-	var legendWidth = 30, legendHeight = 15;
-	var legend = map.append('g')
-		.selectAll('.legend')
+	var legendContainerSize = d3.select('#legend').node().getBoundingClientRect()
+	var rectWidth = legendContainerSize.width/color.range().length, rectHeight = legendContainerSize.height/2;
+	console.log(rectWidth, rectHeight)
+	var legend = d3.select('#legend').append('svg')
+		.attr({
+	          height: legendContainerSize.height,
+	          width: legendContainerSize.width
+	        })
+	legend.append('g')
+		.selectAll('rect')
 		.data(color.range())
 		.enter()
 		.append('rect')
 		.attr({
-			x:function(d, i){return i * legendWidth + mapMargin.left + mapMargin.right},
-			y: 0.8 * mapHeight,
-			height:15,
-			width:legendWidth,
+			x:function(d, i){return i * rectWidth},
+			y: 0,
+			height:rectHeight,
+			width:rectWidth,
 			fill: function(d){return d}
 		})
 		.style('stroke', 'white')
 		.style('stroke-width', '0.6px')
 
 	var legendText = bounds
-	var legendLabels = map.append('g')
+	var legendLabels = legend.append('g')
 		.selectAll('.legendLabels')
 		.data(legendText)
 		.enter()
 		.append('text')
 		.text(function(d){return Math.ceil(d)})
 		.attr({
-			x:function(d,i){return (i+1) * legendWidth},
-			y: 0.8 * mapHeight + legendHeight +12,
+			x:function(d,i){return (i+1) * rectWidth},
+			y: rectHeight +12,
 			class: 'legendLabels'
 		})
 		

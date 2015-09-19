@@ -13,9 +13,7 @@
 select{
 	float: left;
 }
-form{
-	float: right;
-}
+
 
 #mapContainer{
 	float:left;
@@ -30,6 +28,14 @@ form{
 	height:30vw;
 	/*box-shadow: 0 0 5px #888888;*/
 }
+
+#legendAndButtons{
+	float:left;
+	width:48%;
+	height:3vw;
+	/*box-shadow: 0 0 5px #888888;*/
+}
+
 
 /*Map CSS*/
 .nuts-boundary{
@@ -46,6 +52,16 @@ form{
 	/*stroke-dasharray: 2,2;*/
 	stroke-linejoin:round;
 	stroke-linecap:round;
+}
+#legend{
+	float:left;
+	width:43%;
+	height:100%;
+}
+
+form{
+	width:54%;
+	float: right;
 }
 
 .legendLabels{
