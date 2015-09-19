@@ -8,6 +8,8 @@
 <script src="libraries/queue.v1.min.js"></script>
 <script src="libraries/jquery-1.8.3.min.js"></script>
 <script src="libraries/d3.tip.v0.6.3.js"></script>
+<script src="libraries/bootstrap/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="libraries/bootstrap/css/tabs.css">
 <link rel="stylesheet" href="libraries/tool-tip-style.css">
 <link rel="stylesheet" href="libraries/main.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -18,21 +20,39 @@
 
 <body>
 	<div id="main">
-		<div id="mapControl">
-			<div id = "dropDown">
-				<select id= "indicatorList"></select>
-			</div>
-			<div id="mapContainer"></div>
-			<div id="legendAndButtons">
-				<div id="legend"></div>
-				<form action="">
-					<input type="radio" name="mapLevel" value=1>Nuts 1
-					<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
-					<input type="radio" name="mapLevel" value=3>Nuts 3
-				</form>
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#content" data-toggle="tab">Corruption</a></li>
+			<li><a href="#content" data-toggle="tab">Crime</a></li>
+			<li><a href="#content" data-toggle="tab">Finance</a></li>
+			<li><a href="#content" data-toggle="tab">Firm Characteristics</a></li>
+			<li><a href="#content" data-toggle="tab">Gender</a></li>
+			<li><a href="#content" data-toggle="tab">Informality</a></li>
+			<li><a href="#content" data-toggle="tab">Infrastructure</a></li>
+			<li><a href="#content" data-toggle="tab">Innovation & Technology</a></li>
+			<li><a href="#content" data-toggle="tab">Performance</a></li>
+			<li><a href="#content" data-toggle="tab">Regulations & Taxes</a></li>
+			<li><a href="#content" data-toggle="tab">Trade</a></li>
+			<li><a href="#content" data-toggle="tab">Workforce</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="content">
+				<div id="mapControl">
+					<div id = "dropDown">
+						<select id= "indicatorList"></select>
+					</div>
+					<div id="mapContainer"></div>
+					<div id="legendAndButtons">
+						<div id="legend"></div>
+						<form action="">
+							<input type="radio" name="mapLevel" value=1>Nuts 1
+							<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
+							<input type="radio" name="mapLevel" value=3>Nuts 3
+						</form>
+					</div>
+				</div>
+				<div id="panelContainer"></div>
 			</div>
 		</div>
-		<div id="panelContainer"></div>
 	</div>
 </body>
 
@@ -59,7 +79,7 @@ function processGroups(data) {
 	}
 	return array
 }
-function processIndicators(data) {
+function process(data) {
 	var array = {
 		topic: data.topic,
 		indicator: data.indicator,
@@ -129,14 +149,14 @@ queue()
 	.defer(d3.json, "maps/nuts3.json")
 	.defer(d3.csv, "data/nutsData.csv", processData)
 	.defer(d3.csv, "data/groupsWithSymbols.csv", processGroups)
-	.defer(d3.csv, "data/indicators.csv", processIndicators)
+	.defer(d3.csv, "data/indicators.csv", process)
 	.await(ready);
 
 function ready(error, mapFile1, mapFile2, mapFile3, nutsData, groups, indicators){
 	draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators)
 }
 
-function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
+function draw(mapFile1, mapFile2, mapFile3, nutsData, groups,indicators ) {
 
 											//FIRST WE DRAW THE MAPS
 	//HELPER FUNCTIONs
@@ -167,7 +187,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
     }
 
 	//CREATE THE INDICATOR LIST TO POPULATE THE DROPDOWN MENU BASED ON CURRENT TAB
-		//TO-DO: Create an onclick event for clicks on new tabs to redraw the selection for indicators.
+		//TO-DO: Create an onclick event for clicks on new tabs to redraw the selection for .
 	var indicatorList = indicators.filter(function(d) {return d.topic === "Corruption"}) //topic is hardcoded currently, should be base on tab selected
 	var select = d3.select('#indicatorList')
 	select.selectAll('options')
