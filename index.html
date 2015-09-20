@@ -13,9 +13,7 @@
 <link rel="stylesheet" href="libraries/tool-tip-style.css">
 <link rel="stylesheet" href="libraries/main.css">
 <style>
-.bars {
-	stroke:1px solid black;
-}
+
 </style>
 </head>
 
@@ -125,8 +123,10 @@ function wrap(text, width) {
 function setBins(max,min) {// calculates the bins for the color domain in the map
 	var bounds = [];
 	for (var i=1;i<=5;i++) { // create 5 equally sized bins between min*.95 and max*1.05
-		bounds.push(min*.95+(((max*1.05)-(min*.95))*(i/5)));
+		// bounds.push(min*.95+(((max*1.05)-(min*.95))*(i/5)));
+		bounds.push(min+(((100.01)-(min))*(i/5)));
 	}
+	bounds = [20,40,60,80,100.01]
 	return bounds;
 }
 function uniq_fast(a) { // quickly drop duplicate values from an array
@@ -225,8 +225,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
     	//To-Do: Come up with a better color range: http://christopheviau.com/d3list/gallery.html#visualizationType=choropleth
     var filteredData = dataFilter(nutsData, true, 2) //mapOrPanel is set to trues
 
-	var max = d3.max(filteredData, function(d) { return d.value; });
-	var min = d3.min(filteredData, function(d) { return d.value; });
+	// var max = d3.max(filteredData, function(d) { return d.value; });
+	// var min = d3.min(filteredData, function(d) { return d.value; });
+	var max = 100.01;
+	var min = 0;
 	var bounds = setBins(max,min);
 
 	var colorArray = ['rgb(241,238,246)','rgb(189,201,225)','rgb(116,169,207)','rgb(43,140,190)','rgb(4,90,141)']
@@ -320,7 +322,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 		.style('stroke', 'white')
 		.style('stroke-width', '0.6px')
 
-	var legendText = bounds
+	var legendText = [20,40,60,80,100]
 	var legendLabels = legend.append('g')
 		.selectAll('.legendLabels')
 		.data(legendText)
@@ -339,8 +341,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	function redrawMapNUTS(mapFile, nutsData, groupID){
 		filteredData = dataFilter(nutsData, true, groupID)
 		//var test = uniq_fast(filteredData.map(function (d) {return d.regionCode})).sort()
-		max = d3.max(filteredData, function(d) { return d.value; });
-		min = d3.min(filteredData, function(d) { return d.value; });
+		// max = d3.max(filteredData, function(d) { return d.value; });
+		// min = d3.min(filteredData, function(d) { return d.value; });
+		var max = 100.01;
+		var min = 0;
 		bounds = setBins(max,min);
 		color.domain(bounds)
 
@@ -422,10 +426,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
       	//.call(makeResponsiveMap)
 
     //GET THE SCALES AND CHARTING FUNCTIONS READY
-    var maxValue = d3.max(groupedData, function(d) {return d.value});
+    var maxValue = 100;
     var minValue = 0;
     var xScale = d3.scale.linear() //the xScale is set based on the values of the indicator
-    	.domain([minValue, 1.2 * maxValue])
+    	.domain([minValue, maxValue])
     	.range([0, panelWidth]);
 
     //CREATE THE X-AXIS
@@ -473,16 +477,11 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	    			x2:function(e) {return xScale(e.value)},
 	    			y1:function(e, j) {return j * (barHeight + barGap) + barHeight/2},
 	    			y2:function(e, j) {return j * (barHeight + barGap) + barHeight/2},
-	    			// height: barHeight,
 	    			class: 'bars',
-	    			// width: function(e) {return xScale(e.value)},
-	    			// x: 0,
-	    			// y: function(e, j) {return j * (barHeight + barGap)},
 	    			transform: 'translate(' + panelMargin.left + "," + mainCategoryPosition +')'
 	    		})
 	    		.style('stroke','rgb(200,200,200)')
 	    		.style('stroke-width','1px')
-	    		// .style('fill','rgb(43,140,190)')
 	    	
 	    	panel.append('g')
 	    		.selectAll('.dots')
@@ -497,8 +496,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	    			transform: 'translate(' + panelMargin.left + "," + mainCategoryPosition +')'
 	    		})
 	    		.style('fill','red')
-
-	    		// .style('fill','rgb(43,140,190)')
 
 	    	//Draw the sub labels
 	    	var labels = uniq_fast(data.map(function(d) {return d.subGroup}))
@@ -541,16 +538,21 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
     	groupedData = groupData(nutsData, groups, region)
     	
     	//update scales and axis
-    	maxValue = d3.max(groupedData, function(d) {return d.value})
-    	xScale.domain([minValue, 1.2 * maxValue])
-    	numberTicks = Math.ceil((maxValue - minValue)/15)
-    	xAxis.ticks(numberTicks)
-    	xAxisLine.call(xAxis)
+    	// maxValue = d3.max(groupedData, function(d) {return d.value})
+    	// xScale.domain([minValue, 1.2 * maxValue])
+    	// numberTicks = Math.ceil((maxValue - minValue)/15)
+    	// xAxis.ticks(numberTicks)
+    	// xAxisLine.call(xAxis)
 
     	//update the chart
     	d3.selectAll('.bars')
     		.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
-    		.attr('width',function(d) {return xScale(d.value)})
+    		.attr('x2',function(d) {return xScale(d.value)})
+    	d3.selectAll('.dots')
+    		.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
+    		.attr('cx',function(d) {return xScale(d.value)})
+
+
     }
 
 /**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
