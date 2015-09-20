@@ -28,9 +28,9 @@
 			<li><a href="#content" data-toggle="tab" class="tabLink">Gender</a></li>
 			<li><a href="#content" data-toggle="tab" class="tabLink">Informality</a></li>
 			<li><a href="#content" data-toggle="tab" class="tabLink">Infrastructure</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Innovation & Technology</a></li>
+			<li><a href="#content" data-toggle="tab" class="tabLink">Innovation and Technology</a></li>
 			<li><a href="#content" data-toggle="tab" class="tabLink">Performance</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Regulations & Taxes</a></li>
+			<li><a href="#content" data-toggle="tab" class="tabLink">Regulations and Taxes</a></li>
 			<li><a href="#content" data-toggle="tab" class="tabLink">Trade</a></li>
 			<li><a href="#content" data-toggle="tab" class="tabLink">Workforce</a></li>
 		</ul>
@@ -38,7 +38,7 @@
 			<div class="tab-pane active" id="content">
 				<div id="mapControl">
 					<div id = "dropDown">
-						<select id= "indicatorList"></select>
+						<select id="indicatorList"></select>
 					</div>
 					<div id="mapContainer"></div>
 					<div id="legendAndButtons">
@@ -69,6 +69,7 @@ function processData(data) {
 	}
 	return array
 }
+
 function processGroups(data) {
 	var array = {
 		mainGroup: data.mainGroup,
@@ -79,7 +80,7 @@ function processGroups(data) {
 	}
 	return array
 }
-function process(data) {
+function processIndicators(data) {
 	var array = {
 		topic: data.topic,
 		indicator: data.indicator,
@@ -147,17 +148,16 @@ queue()
 	.defer(d3.json, "maps/nuts1.json") //the zone map
 	.defer(d3.json, "maps/nuts2.json")
 	.defer(d3.json, "maps/nuts3.json")
-	.defer(d3.csv, "data/nutsData.csv", processData)
+	.defer(d3.csv, "data/nutsDataCorruption.csv", processData)
 	.defer(d3.csv, "data/groupsWithSymbols.csv", processGroups)
-	.defer(d3.csv, "data/indicators.csv", process)
+	.defer(d3.csv, "data/indicators.csv", processIndicators)
 	.await(ready);
 
 function ready(error, mapFile1, mapFile2, mapFile3, nutsData, groups, indicators){
 	draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators)
 }
 
-function draw(mapFile1, mapFile2, mapFile3, nutsData, groups,indicators ) {
-
+function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 											//FIRST WE DRAW THE MAPS
 	//HELPER FUNCTIONs
 	//TO ADD INDICATOR DATA TO THE MAP
@@ -188,14 +188,21 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups,indicators ) {
 
 	//CREATE THE INDICATOR LIST TO POPULATE THE DROPDOWN MENU BASED ON CURRENT TAB
 		//TO-DO: Create an onclick event for clicks on new tabs to redraw the selection for .
-	var indicatorList = indicators.filter(function(d) {return d.topic === "Corruption"}) //topic is hardcoded currently, should be base on tab selected
-	var select = d3.select('#indicatorList')
-	select.selectAll('options')
-		.data(indicatorList)
-		.enter()
-		.append('option')
-		.attr('value', function(d) {return d.indicatorID})
-		.text(function(d) {return d.indicator})
+
+	function generateDropDown(indicatorList, topic) {
+		var indicators = indicatorList.filter(function(d) {return d.topic === topic})
+		//console.log()
+		d3.select('#indicatorList')
+			.selectAll('option')
+			.data(indicators)
+			.enter()
+			.append('option')
+			.attr('value', function(d) {return d.indicatorID})
+			.text(function(d) {return d.indicator})
+		//console.log(d3.select('#indicatorList')[0][0])
+	}
+	generateDropDown(indicatorList, "Corruption") //topic is hardcoded currently, should be base on tab selected
+	
 
 
 	//CREATE THE CANVAS
@@ -521,8 +528,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups,indicators ) {
     	d3.selectAll('.bars')
     		.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
     		.attr('width',function(d) {return xScale(d.value)})
-
-
     }
 
 /**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
@@ -585,10 +590,36 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups,indicators ) {
 
 
 
-	d3.selectAll('.tabLink')
-		.on('click', function(d) {
-			console.log(this.innerHTML)
+	d3.selectAll('.tabLink').on('click', function(d) {
+		var tab = this.innerHTML
+
+		//update the dropdown based on new tab
+		d3.selectAll('option').remove()
+		generateDropDown(indicatorList, tab)
+
+		//reset the radio button
+		$('input[type="radio"][name="mapLevel"][value='+'2'+']').prop('checked',true)
+
+		//reset the mapFile to NUTS2
+		mapFile = mapFile2
+		
+		//load the new data and redraw map and chart
+		var pathName = "data/nutsData"+tab+".csv"
+		d3.csv(pathName, function(error, nutsDataNew){
+			nutsDataNew.forEach(function(e){
+				e.regionCode = e.regionCode;
+				e.groupID = deString(e.groupID);
+				e.indicatorID = deString(e.indicatorID),
+				e.sampleSize = deString(e.N),
+				e.value = deString(e.value)
+			})
+			nutsData = nutsDataNew
+			redrawMapNUTS(mapFile, nutsData, 2)
+			redrawPanel(nutsData, groups, defaultRegion)
+
+
 		})
+	})
 }
 	//Test: Automatically center map
 /*	http://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
