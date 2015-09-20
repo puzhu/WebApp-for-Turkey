@@ -12,9 +12,10 @@
 <link rel="stylesheet" href="libraries/bootstrap/css/tabs.css">
 <link rel="stylesheet" href="libraries/tool-tip-style.css">
 <link rel="stylesheet" href="libraries/main.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-<script src="http://d3js.org/topojson.v1.min.js"></script>
 <style>
+.bars {
+	stroke:1px solid black;
+}
 </style>
 </head>
 
@@ -466,16 +467,38 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	    		.selectAll('.bars')
 	    		.data(data)
 	    		.enter()
-	    		.append('rect')
+	    		.append('line')
 	    		.attr({
-	    			height: barHeight,
+	    			x1:0,
+	    			x2:function(e) {return xScale(e.value)},
+	    			y1:function(e, j) {return j * (barHeight + barGap) + barHeight/2},
+	    			y2:function(e, j) {return j * (barHeight + barGap) + barHeight/2},
+	    			// height: barHeight,
 	    			class: 'bars',
-	    			width: function(e) {return xScale(e.value)},
-	    			x: 0,
-	    			y: function(e, j) {return j * (barHeight + barGap)},
+	    			// width: function(e) {return xScale(e.value)},
+	    			// x: 0,
+	    			// y: function(e, j) {return j * (barHeight + barGap)},
 	    			transform: 'translate(' + panelMargin.left + "," + mainCategoryPosition +')'
 	    		})
-	    		.style('fill','rgb(43,140,190)')
+	    		.style('stroke','rgb(200,200,200)')
+	    		.style('stroke-width','1px')
+	    		// .style('fill','rgb(43,140,190)')
+	    	
+	    	panel.append('g')
+	    		.selectAll('.dots')
+	    		.data(data)
+	    		.enter()
+	    		.append('circle')
+	    		.attr({
+	    			cx:function(e) {return xScale(e.value)},
+	    			cy:function(e, j) {return j * (barHeight + barGap) + barHeight/2},
+	    			class: 'dots',
+	    			r:3,
+	    			transform: 'translate(' + panelMargin.left + "," + mainCategoryPosition +')'
+	    		})
+	    		.style('fill','red')
+
+	    		// .style('fill','rgb(43,140,190)')
 
 	    	//Draw the sub labels
 	    	var labels = uniq_fast(data.map(function(d) {return d.subGroup}))
