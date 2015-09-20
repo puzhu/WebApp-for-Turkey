@@ -5,32 +5,20 @@
 	margin-top: 2vmax;
 }
 
-#mapControl{
-	float:left;
-	width:48%;
-	height:30vw;
+.controls{
+	width: 100%;
+	height: 30px;
 	/*box-shadow: 0 0 5px #888888;*/
 }
-
 select{
 	float: left;
-	margin-top: 2%;
-	margin-left: 2%;
-	height: 2vw
 }
 
 
 #mapContainer{
-	float: left;
-	width: 100%;
-	height: 25vw;
-	/*box-shadow: 0 0 5px #888888;*/
-}
-#legendAndButtons{
 	float:left;
-	margin-left: 2%;
-	width:100%;
-	height:3vw;
+	width:48%;
+	height:27vw;
 	/*box-shadow: 0 0 5px #888888;*/
 }
 
@@ -41,7 +29,12 @@ select{
 	/*box-shadow: 0 0 5px #888888;*/
 }
 
-
+#legendAndButtons{
+	float:left;
+	width:48%;
+	height:3vw;
+	/*box-shadow: 0 0 5px #888888;*/
+}
 
 
 /*Map CSS*/
@@ -72,37 +65,40 @@ form{
 }
 
 .legendLabels{
-	font-family:Arial;
+	font-family: sans-serif;
 	font-size: 12px;
-	alignment-baseline:hanging;
-	text-anchor:end;
 }
 /*Panel CSS*/
-.catLabel{
-    font-family:Arial;
-    /*text-anchor:end;*/
-    alignment-baseline:hanging;
-    font-style: italic;
-    font-weight: bold;
-}
-.bars{
-
-}
-.subLabels{
-    font-size:11px;
-    font-family:Arial;
-    text-anchor:end;
-    alignment-baseline:hanging;
+.hLines{
+	stroke: lightgrey;
+	stroke-width: 0.4px;
 }
 
+.vLines{
+	stroke: lightgrey;
+	stroke-width: 0.4px;
+}
 
-.xAxis path, .xAxis line{
+.symbols {
+    font-family: FontAwesome;
+    opacity: 0.6;
+ }
+ .xAxis path, .xAxis line{
  	fill:none;
  	stroke: lightgrey;
  	shape-rendering: crispEdges;
  }
 
-.xAxis text{
+ .xAxis text{
  	font-size: 12px;
  	font-family: sans-serif;
  }
+
+.yLabels{
+	/*vertical-align: middle;*/
+}
+
+
+
+
+

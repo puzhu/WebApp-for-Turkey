@@ -18,22 +18,21 @@
 
 <body>
 	<div id="main">
-		<div class='controls'>
+		<div id="mapControl">
 			<div id = "dropDown">
 				<select id= "indicatorList"></select>
 			</div>
+			<div id="mapContainer"></div>
+			<div id="legendAndButtons">
+				<div id="legend"></div>
+				<form action="">
+					<input type="radio" name="mapLevel" value=1>Nuts 1
+					<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
+					<input type="radio" name="mapLevel" value=3>Nuts 3
+				</form>
+			</div>
 		</div>
-		<div id="mapContainer"></div>
 		<div id="panelContainer"></div>
-		<div id="legendAndButtons">
-			<div id="legend"></div>
-			<form action="">
-				<input type="radio" name="mapLevel" value=1>Nuts 1
-				<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
-				<input type="radio" name="mapLevel" value=3>Nuts 3
-			</form>
-		</div>
-
 	</div>
 </body>
 
@@ -146,10 +145,12 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 		for (i = 0; i < data.length; i++) {
 			var value = data[i].value;
 			var regionCode = data[i].regionCode
-
+			if(uniq_fast(mapFeatures.map(function(d) {return d.properties.adminLevel})).indexOf(regionCode) === -1) console.log(regionCode)
 			var feature = mapFeatures.filter(function(d) { return d.properties.adminLevel === regionCode;})
-			if (feature.length > 0) {feature[0].properties.value = value;
-				feature[0].properties.active = false;}
+			console.log(feature.length)
+			for(j = 0; j < feature.length; j++) {
+				feature[j].properties.value = value;
+			}
 		}
 		return mapFeatures;
 	}
@@ -300,9 +301,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 		.text(function(d){return Math.ceil(d)})
 		.attr({
 			x:function(d,i){return (i+1) * rectWidth},
-			y: rectHeight +12,
+			y: rectHeight + 1,
 			class: 'legendLabels'
 		})
+		.style('alignment-baseline', 'hanging')
 		
 	//REDRAW FUNCTION
 		//To-Do: Create a single function that responds to all the trigger events
@@ -318,7 +320,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 		mapKey = Object.keys(mapFile.objects)
 		mapFeatures = topojson.feature(mapFile, mapFile.objects[mapKey]).features
 		mapFeatures = addInditoMap(filteredData, mapFeatures)
-
+		//console.log(mapFeatures.map(function(d){return d.properties.adminLevel}))
 		turkeyMap.remove()
 		turkeyMap = map.append('g').selectAll('.turkeyMap') //the large map with zone boundaries
 			.data(mapFeatures)
@@ -365,8 +367,8 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 				subGroup: d.subGroup,
 				groupID: d.groupID,
 				value: value,
-				symbol:d.symbol,
-				fontSize: d.fontSize
+				// symbol:d.symbol,
+				// fontSize: d.fontSize
 			})
 		})
 		return array
@@ -375,10 +377,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 	//GET THE DATA INTO THE DIFFERENT GROUPS (HORIZ LINES) FOR THE SIDE PANEL
 	var defaultRegion = "TR"
 	var groupedData = groupData(nutsData, groups, defaultRegion); //the default region is set to national ("TR") for panel view
-
+	console.log(groupedData)
 	//GET THE CANVAS READY
 	var panelContainerSize = d3.select('#panelContainer').node().getBoundingClientRect();
-  	var panelMargin = {top: 0.1 * panelContainerSize.height , right: 0.00008 * panelContainerSize.width, bottom: 0.008 * panelContainerSize.height, left: 0.15 * panelContainerSize.width};
+  	var panelMargin = {top: 0.08 * panelContainerSize.height , right: 0.08 * panelContainerSize.width, bottom: 0.008 * panelContainerSize.height, left: 0.2 * panelContainerSize.width};
   	var panelWidth = panelContainerSize.width - panelMargin.right - panelMargin.left; //Chart width
   	var panelHeight = panelContainerSize.height - panelMargin.top - panelMargin.bottom; //Chart height
 
@@ -388,20 +390,15 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
           width: panelWidth + panelMargin.left + panelMargin.right
         })
         .attr("id", "panelSvg")
-      	.attr("transform", "translate(" + (panelMargin.left) + "," + (panelMargin.top)+ ")");//moving the origin to the point where it starts
+      	// .attr("transform", "translate(" + (panelMargin.left) + "," + (panelMargin.top)+ ")");//moving the origin to the point where it starts
       	//.call(makeResponsiveMap)
 
     //GET THE SCALES AND CHARTING FUNCTIONS READY
-    var maxValue = d3.max(groupedData, function(d) {return d.value})
-    var minValue = d3.min(groupedData, function(d) {return d.value})
+    var maxValue = d3.max(groupedData, function(d) {return d.value});
+    var minValue = 0;
     var xScale = d3.scale.linear() //the xScale is set based on the values of the indicator
-    	.domain([minValue, maxValue])
-    	.range([panelMargin.left, panelWidth]);
-
-   	var yDomain = uniq_fast(groups.map(function(d) {return d.mainGroup}))
-    var yScale = d3.scale.ordinal() //based on the number of mainGroups in the groups csv
-    	.domain(yDomain)
-    	.rangeBands([60, panelHeight], 0.1); //the range band fixes a margin of 60 for the first line
+    	.domain([minValue, 1.2 * maxValue])
+    	.range([0, panelWidth]);
 
     //CREATE THE X-AXIS
     var numberTicks = Math.floor((maxValue - minValue)/15); //shared with the grid
@@ -413,143 +410,99 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
     var xAxisLine = panel.append('g')
     	.attr('class', 'xAxis')
     	.call(xAxis)
-    	.attr('transform', "translate(0, " + (panelHeight - panelMargin.top) + ")")
+    	.attr('transform', 'translate(' + panelMargin.left + "," + (panelHeight) + ")")
     	.style('cursor', 'default')
 
-    //CREATE TOOLTIP
-    	//Fine-tune the design for tooltip
-    var symbolTip = d3.tip()
-    	.attr('class', 'd3-tip')
-    	.offset([10, 5])
-      	.direction('e')
-      	.html(function(d) {return "<strong class='symbols'; style = 'font-size:32px'>" + d.symbol +"</strong> <span>" +"   "+ d.subGroup + "</span>" + "<br>" +
-      		"<strong style='color:silver'>Value:</strong> <span>" + d.value + "</span>"})
+    function drawBars(groupedData) {
+    	//DRAWING THE ELEMENTS
+	    var mainCategories = uniq_fast(groupedData.map(function(d) {return d.mainGroup})).sort()
+	    var barHeight = 9;
+	    var barGap = 5;
+	    var padding = 5;
+	    var mainFont = 14;
+	    var mainCategoryPosition = panelMargin.top
 
-	//DRAW GRID
-	var hGrid = panel.append('g')
-		.selectAll('.hLines')
-		.data(yDomain)
-		.enter()
-		.append('line')
-		.attr({
-			x1: xScale(minValue),
-    		y1: function(d) {return yScale(d) - 6},
-    		x2: xScale(maxValue),
-    		y2: function(d) {return yScale(d) - 6},
-    		class: 'hLines'
-		})
+	    mainCategories.forEach(function(d, i) {
+	    	//Draw the main category Label
+	    	panel.append('text')
+	            .attr('class','catLabel')
+		        .text(d)
+		        .attr({
+		        	x: 0, //1.25 * panelMargin.left,
+		        	y: mainCategoryPosition - mainFont - padding
+		        })
+		        .style('font-size', mainFont + 'px');
+		    
+	    	//Draw the sub category bars for the main category
+	    	var data = groupedData.filter(function(e) {return e.mainGroup === d})
+	    	panel.append('g')
+	    		.selectAll('.bars')
+	    		.data(data)
+	    		.enter()
+	    		.append('rect')
+	    		.attr({
+	    			height: barHeight,
+	    			class: 'bars',
+	    			width: function(e) {return xScale(e.value)},
+	    			x: 0,
+	    			y: function(e, j) {return j * (barHeight + barGap)},
+	    			transform: 'translate(' + panelMargin.left + "," + mainCategoryPosition +')'
+	    		})
+	    		.style('fill','rgb(43,140,190)')
 
-	var vGrid = panel.append('g')
-		.selectAll('.vLines')
-		.data(xScale.ticks(numberTicks))
-		.enter()
-		.append('line')
-		.attr({
-			x1: function(d){return xScale(d)},
-			y1: yScale(yDomain[0]),
-			x2: function(d){return xScale(d)},
-			y2: yScale(yDomain[4]),
-			class: 'vLines'
-		})
+	    	//Draw the sub labels
+	    	var labels = uniq_fast(data.map(function(d) {return d.subGroup}))
+	    	panel.append('g')
+	    		.selectAll('.subLabels')
+	    		.data(labels)
+	    		.enter()
+	    		.append('text')
+	    		.attr({
+	    			width: panelMargin.left,
+	    			x: panelMargin.left - padding,
+	    			y: function(e, j) {return j * (barHeight + barGap)},
+	    			class: 'subLabels',
+	    			transform: 'translate(0,' + mainCategoryPosition + ')'
+	    		})
+	    		.text(function(d) {return d})
+	    	
 
-	//DRAW ELEMENTS ON THE PANEL
-    	//To-Do: Address symbol overlap while hovering http://bl.ocks.org/lilyc5459/a35687613ab0f4991f37
-    var symbols = panel.append('g')// dots of equal radius based on the value of the indicator placed based on the grouping
-    	.selectAll('.symbols')
-    	.data(groupedData)
-    	.enter()
-    	.append('text')
-    	.html(function(d) {return d.symbol})
-    	.attr({
-    		x: function(d) {return xScale(d.value)},
-    		y: function(d) {return yScale(d.mainGroup)},
-    		class: 'symbols'
-    	})
-    	.style('font-size', function(d) {return d.fontSize + "px"})
-    	.style('cursor', 'pointer')
-    	.on('mouseover', mouseoverSymbol)
-    	.on('mouseout', mouseoutSymbol)
-    	.call(symbolTip);
+	    	//update the Y position
+	    	mainCategoryPosition += data.length * (barHeight + barGap) + (2 * mainFont)
+	    })
+		var textLabels = d3.selectAll('.subLabels')[0]
+		for(i = 0; i < textLabels.length; i++) {
+			if(textLabels[i].getBBox().width > panelMargin.left - padding) {
+				var len = textLabels[i].innerHTML.length
+				while(textLabels[i].getBBox().width > panelMargin.left - padding){
+					len--
+					textLabels[i].innerHTML = textLabels[i].innerHTML.substring(0, len) + "..."
+				}
+			}
+		}
+    }
 
-   	//PREVENTING SYMBOL OVERLAP 
-    	//To-Do: Apply this on symbol hover
-/*	$(document).ready(function() {
-		$(document).mousemove(function(event) {
-			console.log(event.pageX);
-			console.log(event.pageY);
-		})
-	})*/
-/*    relax(6, 10)
-    function relax(spacing, minGap) {
-    	symbols.each(function(d, i){
-    		a = this
-    		group1 = d3.select(a).data()[0].mainGroup
-    		xPosition1 = d3.select(a).attr('x')
-    		yPosition1 = d3.select(a).attr('y')
-    		symbols.each(function(e, j) {
-    			b = this;
-    			group2 = d3.select(b).data()[0].mainGroup
-    			xPosition2 = d3.select(b).attr('x')
-    			yPosition2 = d3.select(b).attr('y')
-    			delta = xPosition1 - xPosition2
-    			if(a != b && group1 === group2 && yPosition1 === yPosition2 && Math.abs(delta) < minGap) {
-    				d3.select(a).transition().duration(2000).attr('y', + yPosition1 - spacing)
-    				//d3.select(b).transition().duration(2000).attr('x', +xPosition2 - adjust)
-    				return
-    			}
-    		})
-    	})
-    }*/
+    drawBars(groupedData)
 
-    //DRAW LABELS
-    var yLabels = panel.append('g')
-    	.selectAll('.yLabels')
-    	.data(yDomain)
-    	.enter()
-    	.append('text')
-    	.text(function(d) {return d})
-    	.attr({
-    		x: xScale(minValue) - 90,
-    		y: function(d) {return yScale(d) - 6},
-    		class: 'yLabels'
-    	})
-    	.style('cursor', 'default')
-    	.call(wrap, 90)
 
     //REDRAW FUNCTION FOR THE PANEL
     function redrawPanel(nutsData, groups, region){
+    	//get the new data
     	groupedData = groupData(nutsData, groups, region)
+    	
+    	//update scales and axis
     	maxValue = d3.max(groupedData, function(d) {return d.value})
-    	minValue = d3.min(groupedData, function(d) {return d.value})
-    	xScale.domain([minValue, maxValue])
-
+    	xScale.domain([minValue, 1.2 * maxValue])
     	numberTicks = Math.ceil((maxValue - minValue)/15)
     	xAxis.ticks(numberTicks)
     	xAxisLine.call(xAxis)
-    	vGrid = vGrid.data(xScale.ticks(numberTicks))
-    	vGrid.exit().remove()
-    	vGrid.enter().append('line')
-    	vGrid.transition().duration(400).attr({
-    		x1: function(d){return xScale(d)},
-			y1: yScale(yDomain[0]),
-			x2: function(d){return xScale(d)},
-			y2: yScale(yDomain[4]),
-			class: 'vLines'
-    	})
 
-    	symbols = symbols.data(groupedData)
-    	symbols.exit().remove()
-    	symbols.enter().append('text').html(function(d) {return d.symbol})
-    	symbols.transition().duration(400).attr({
-    		x: function(d) {return xScale(d.value)},
-    		y: function(d) {return yScale(d.mainGroup)},
-    		class: 'symbols'
-    	})
-    	symbols.style('font-size', function(d) {return d.fontSize + "px"})
-    		.style('cursor', 'pointer')
-    	symbols.on('mouseover', mouseoverSymbol)
-    		.on('mouseout', mouseoutSymbol)
-    		.call(symbolTip);
+    	//update the chart
+    	d3.selectAll('.bars')
+    		.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
+    		.attr('width',function(d) {return xScale(d.value)})
+
+
     }
 
 /**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
@@ -600,14 +553,14 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicators) {
 	}*/
 
 	//5. PANEL DOT HOVER
-	function mouseoverSymbol(d) {
+	function mouseoverBar(d) {
 		redrawMapNUTS(mapFile, nutsData, d.groupID)
-		symbolTip.show(d)
+		barTip.show(d)
 	}
 
-	function mouseoutSymbol(d) {
+	function mouseoutBar(d) {
 		redrawMapNUTS(mapFile, nutsData, 2)
-		symbolTip.hide(d)
+		barTip.hide(d)
 	}
 
 }
