@@ -36,6 +36,8 @@
 		<div class="tab-content">
 			<div class="tab-pane active" id="content">
 				<div id="mapControl">
+					<h3>Average indicator values by region</h3>
+					<p>Hover to see values for region by groups</p>
 					<div id = "dropDown">
 						<select id="indicatorList"></select>
 					</div>
@@ -49,14 +51,21 @@
 						</form>
 					</div>
 				</div>
-				<div id="panelContainer"></div>
+				<div id="panelContainer">
+					<h3>Average indicator values by groupings</h3>
+					<p>Hover to see values for group on map</p>
+				</div>
 			</div>
 		</div>
 	</div>
 </body>
 
 <script>
-
+d3.selection.prototype.moveToFront = function() {
+	return this.each(function(){
+		this.parentNode.appendChild(this);
+	});
+};
 //DATA PROCESSING FUNCTIONS
 function processData(data) {
 	var array = {
@@ -150,7 +159,7 @@ queue()
 	.defer(d3.json, "maps/nuts2.json")
 	.defer(d3.json, "maps/nuts3.json")
 	.defer(d3.csv, "data/nutsDataCorruption.csv", processData)
-	.defer(d3.csv, "data/groupsWithSymbols.csv", processGroups)
+	.defer(d3.csv, "data/groups.csv", processGroups)
 	.defer(d3.csv, "data/indicators.csv", processIndicators)
 	.await(ready);
 
@@ -168,7 +177,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 			var regionCode = data[i].regionCode
 			if(uniq_fast(mapFeatures.map(function(d) {return d.properties.adminLevel})).indexOf(regionCode) === -1) console.log(regionCode)
 			var feature = mapFeatures.filter(function(d) { return d.properties.adminLevel === regionCode;})
-			console.log(feature.length)
 			for(j = 0; j < feature.length; j++) {
 				feature[j].properties.value = value;
 			}
@@ -186,13 +194,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
    			return nutsData.filter(function(d) { return d.indicatorID === currentIndicator && d.groupID !== 2})//fixing this to 2 since for panel that is the only value we will be using to filter
    		}
     }
-
 	//CREATE THE INDICATOR LIST TO POPULATE THE DROPDOWN MENU BASED ON CURRENT TAB
-		//TO-DO: Create an onclick event for clicks on new tabs to redraw the selection for .
-
 	function generateDropDown(indicatorList, topic) {
 		var indicators = indicatorList.filter(function(d) {return d.topic === topic})
-		//console.log()
+
 		d3.select('#indicatorList')
 			.selectAll('option')
 			.data(indicators)
@@ -200,11 +205,8 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 			.append('option')
 			.attr('value', function(d) {return d.indicatorID})
 			.text(function(d) {return d.indicator})
-		//console.log(d3.select('#indicatorList')[0][0])
 	}
 	generateDropDown(indicatorList, "Corruption") //topic is hardcoded currently, should be base on tab selected
-	
-
 
 	//CREATE THE CANVAS
 	var mapContainerSize = d3.select('#mapContainer').node().getBoundingClientRect()
@@ -222,21 +224,13 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
       	//.call(makeResponsiveMap)
 
     //SET THE DOMAINS AND RANGES
-    	//To-Do: Come up with a better color range: http://christopheviau.com/d3list/gallery.html#visualizationType=choropleth
     var filteredData = dataFilter(nutsData, true, 2) //mapOrPanel is set to trues
-
-	// var max = d3.max(filteredData, function(d) { return d.value; });
-	// var min = d3.min(filteredData, function(d) { return d.value; });
 	var max = 100.01;
 	var min = 0;
 	var bounds = setBins(max,min);
 
 	var colorArray = ['rgb(241,238,246)','rgb(189,201,225)','rgb(116,169,207)','rgb(43,140,190)','rgb(4,90,141)']
-	//colorArray.reverse();
 
-	/*var color = d3.scale.threshold()
-		.domain(bounds)
-		.range(colorArray);*/
 	var color = d3.scale.threshold()
     	.domain(bounds)
     	.range(colorArray);
@@ -248,7 +242,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	mapFeatures = addInditoMap(filteredData, mapFeatures)
 
 	//SETTING THE MAP PROJECTION AND PATH
-		//To-Do: Automatically center a map
 	var mapProjection = d3.geo.mercator()
 		.center([19.5,72.7])
 		.scale(550)
@@ -265,7 +258,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
       	.direction('e')
       	.html(function(d) {return "<strong>Name:</strong> <span style='color:silver'>" + d.properties.name + "</span>" + "<br>" +
       		"<strong>Value:</strong> <span style='color:silver'>" + d.properties.value + "</span>" })
-    
+
 	//DRAWING THE MAP
 	var turkeyMap = map.append('g').selectAll('.turkeyMap') //the large map with zone boundaries
 		.data(mapFeatures)
@@ -279,29 +272,31 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 		.style('cursor', 'pointer')
 		.on('mouseover', mouseoverRegion)
 		.on('mouseout', mouseoutRegion)
-		.call(mapTip)
-		//.on('click', onClickRegion);
+		.call(mapTip);
 
 	//DRAWING BOUNDARIES
-		//To-Do: Different boundaries for different nuts levels 2. Country boundary 3. Active Boundary
-	var internalBoundaries = map.append("path") //the zonal boundaries
-		.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a !== b}))
-		.attr({
-			d: mapPath,
-			class: 'nuts-boundary'
-		});
-
-	var countryBoundary = map.append('path')
+	var countryBoundary = map.append('g').append('path')
 		.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) {return a === b}))
 		.attr({
 			d: mapPath,
 			class: 'country-boundary'
 		});
 
+	var regionArray = uniq_fast(mapFeatures.map(function(d) {return d.properties.adminLevel}))
+	regionArray.forEach(function(d) {
+		map.append("path")
+			.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a.properties.adminLevel === d || b.properties.adminLevel === d;}))
+			.attr({
+				d: mapPath,
+				'class': 'nuts-boundary' //controls the fill in css
+			})
+			.attr("id",function(e) {return d});
+	});
+
 	//DRAW MAP LEGEND
 	var legendContainerSize = d3.select('#legend').node().getBoundingClientRect()
 	var rectWidth = legendContainerSize.width/color.range().length, rectHeight = legendContainerSize.height/2;
-	console.log(rectWidth, rectHeight)
+
 	var legend = d3.select('#legend').append('svg')
 		.attr({
 	          height: legendContainerSize.height,
@@ -335,14 +330,11 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 			class: 'legendLabels'
 		})
 		.style('alignment-baseline', 'hanging')
-		
+
 	//REDRAW FUNCTION
-		//To-Do: Create a single function that responds to all the trigger events
 	function redrawMapNUTS(mapFile, nutsData, groupID){
 		filteredData = dataFilter(nutsData, true, groupID)
-		//var test = uniq_fast(filteredData.map(function (d) {return d.regionCode})).sort()
-		// max = d3.max(filteredData, function(d) { return d.value; });
-		// min = d3.min(filteredData, function(d) { return d.value; });
+
 		var max = 100.01;
 		var min = 0;
 		bounds = setBins(max,min);
@@ -352,7 +344,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 		mapKey = Object.keys(mapFile.objects)
 		mapFeatures = topojson.feature(mapFile, mapFile.objects[mapKey]).features
 		mapFeatures = addInditoMap(filteredData, mapFeatures)
-		//console.log(mapFeatures.map(function(d){return d.properties.adminLevel}))
+
 		turkeyMap.remove()
 		turkeyMap = map.append('g').selectAll('.turkeyMap') //the large map with zone boundaries
 			.data(mapFeatures)
@@ -366,23 +358,19 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 			.style('cursor', 'pointer')
 			.on('mouseover', mouseoverRegion)
 			.on('mouseout', mouseoutRegion)
-			.call(mapTip)
-			//.on('click', onClickRegion);
+			.call(mapTip);
 
-		internalBoundaries.remove()
-		internalBoundaries = map.append('path')
-		internalBoundaries.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a !== b}))
-		internalBoundaries.attr({
-				d: mapPath,
-				class: 'nuts-boundary'
-			});
-		countryBoundary.remove()
-		countryBoundary = map.append('path')
-		countryBoundary.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a === b}))
-		countryBoundary.attr({
-				d: mapPath,
-				class: 'country-boundary'
-			});
+		d3.selectAll('.nuts-boundary').remove()
+		regionArray = uniq_fast(mapFeatures.map(function(d) {return d.properties.adminLevel}))
+		regionArray.forEach(function(d) {
+			map.append("path")
+				.datum(topojson.mesh(mapFile, mapFile.objects[mapKey], function(a, b) { return a.properties.adminLevel === d || b.properties.adminLevel === d;}))
+				.attr({
+					d: mapPath,
+					'class': 'nuts-boundary' //controls the fill in css
+				})
+				.attr("id",function(e) {return d});
+		});
 	}
 
 /**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
@@ -398,9 +386,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 				mainGroup: d.mainGroup,
 				subGroup: d.subGroup,
 				groupID: d.groupID,
-				value: value,
-				// symbol:d.symbol,
-				// fontSize: d.fontSize
+				value: value
 			})
 		})
 		return array
@@ -409,7 +395,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	//GET THE DATA INTO THE DIFFERENT GROUPS (HORIZ LINES) FOR THE SIDE PANEL
 	var defaultRegion = "TR"
 	var groupedData = groupData(nutsData, groups, defaultRegion); //the default region is set to national ("TR") for panel view
-	console.log(groupedData)
+
 	//GET THE CANVAS READY
 	var panelContainerSize = d3.select('#panelContainer').node().getBoundingClientRect();
   	var panelMargin = {top: 0.08 * panelContainerSize.height , right: 0.08 * panelContainerSize.width, bottom: 0.008 * panelContainerSize.height, left: 0.2 * panelContainerSize.width};
@@ -422,7 +408,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
           width: panelWidth + panelMargin.left + panelMargin.right
         })
         .attr("id", "panelSvg")
-      	// .attr("transform", "translate(" + (panelMargin.left) + "," + (panelMargin.top)+ ")");//moving the origin to the point where it starts
+      	.attr("transform", "translate(," + (panelMargin.top)+ ")");//moving the origin to the point where it starts
       	//.call(makeResponsiveMap)
 
     //GET THE SCALES AND CHARTING FUNCTIONS READY
@@ -442,8 +428,16 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
     var xAxisLine = panel.append('g')
     	.attr('class', 'xAxis')
     	.call(xAxis)
-    	.attr('transform', 'translate(' + panelMargin.left + "," + (panelHeight) + ")")
+    	.attr('transform', 'translate(' + panelMargin.left + "," + (panelHeight + panelMargin.top/2) + ")")
     	.style('cursor', 'default')
+
+    //TOOLTIP
+    var barTip = d3.tip()
+    	.attr('class', 'd3-tip')
+    	.offset([0, 0])
+      	.direction('w')
+      	.html(function(e) {return "<strong>Name:</strong> <span style='color:silver'>" + e.subGroup + "</span>" + "<br>" +
+      		"<strong>Value:</strong> <span style='color:silver'>" + e.value + "</span>" })
 
     function drawBars(groupedData) {
     	//DRAWING THE ELEMENTS
@@ -463,8 +457,9 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 		        	x: 0, //1.25 * panelMargin.left,
 		        	y: mainCategoryPosition - mainFont - padding
 		        })
-		        .style('font-size', mainFont + 'px');
-		    
+		        .style('font-size', mainFont + 'px')
+		        .style('cursor', 'default');
+
 	    	//Draw the sub category bars for the main category
 	    	var data = groupedData.filter(function(e) {return e.mainGroup === d})
 	    	panel.append('g')
@@ -482,7 +477,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	    		})
 	    		.style('stroke','rgb(200,200,200)')
 	    		.style('stroke-width','1px')
-	    	
+
 	    	panel.append('g')
 	    		.selectAll('.dots')
 	    		.data(data)
@@ -512,7 +507,24 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	    			transform: 'translate(0,' + mainCategoryPosition + ')'
 	    		})
 	    		.text(function(d) {return d})
-	    	
+
+	    	//Draw hover rectangles
+	    	panel.append('g')
+	    		.selectAll('.hoverRects')
+	    		.data(data)
+	    		.enter()
+	    		.append('rect')
+	    		.attr({
+	    			x:0,
+	    			y:function(e, j) {return j * (barHeight + barGap) + mainCategoryPosition},
+	    			height: 1.6 * barHeight,
+	    			width: panelWidth + panelMargin.left,
+	    			class: 'hoverRects'
+	    		})
+	    		.style('cursor', 'default')
+	    		.on('mouseover', mouseoverBar)
+	    		.on('mouseout', mouseoutBar)
+	    		.call(barTip);
 
 	    	//update the Y position
 	    	mainCategoryPosition += data.length * (barHeight + barGap) + (2 * mainFont)
@@ -537,13 +549,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
     	//get the new data
     	groupedData = groupData(nutsData, groups, region)
     	
-    	//update scales and axis
-    	// maxValue = d3.max(groupedData, function(d) {return d.value})
-    	// xScale.domain([minValue, 1.2 * maxValue])
-    	// numberTicks = Math.ceil((maxValue - minValue)/15)
-    	// xAxis.ticks(numberTicks)
-    	// xAxisLine.call(xAxis)
-
     	//update the chart
     	d3.selectAll('.bars')
     		.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
@@ -551,8 +556,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
     	d3.selectAll('.dots')
     		.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
     		.attr('cx',function(d) {return xScale(d.value)})
-
-
     }
 
 /**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
@@ -579,41 +582,33 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
     });
 
 	//3. MOUSE-HOVER ON REGION
-		//To-Do: Implement a smooth boundary transition that is attractive
 	function mouseoverRegion(d) {
 		var hoverRegion = d.properties.adminLevel;
 		redrawPanel(nutsData, groups, hoverRegion)
 		mapTip.show(d)
+		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', true).moveToFront()
 	}
 	function mouseoutRegion(d) {
+		var hoverRegion = d.properties.adminLevel;
 		redrawPanel(nutsData, groups, defaultRegion)
 		mapTip.hide(d)
+		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', false)//.classed('.nuts-boundary', true)
 	}
 
-	/*//4. MOUSE-CLICK ON REGION- implement only if necessary
-		//To-Do: Execute an efficient and elegant toggle mechanism for clicked regions
-	
-	function onClickRegion(d) {
-		if(d.properties.active) { //if the state is already active then toggle to nont-active
-			d.properties.active = false;
-		} else {
-			d.properties.active = true;
-		}
-		console.log(d)
-	}*/
-
-	//5. PANEL DOT HOVER
+	//4. PANEL HOVER
 	function mouseoverBar(d) {
 		redrawMapNUTS(mapFile, nutsData, d.groupID)
 		barTip.show(d)
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).attr({r: 5})
+		d3.selectAll('.subLabels').filter(function(e) {return e=== d.subGroup}).style('font-style', 'italic')
 	}
 
 	function mouseoutBar(d) {
 		redrawMapNUTS(mapFile, nutsData, 2)
 		barTip.hide(d)
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).attr({r: 3})
+		d3.selectAll('.subLabels').filter(function(e) {return e=== d.subGroup}).style('font-style', 'normal')
 	}
-
-
 
 	d3.selectAll('.tabLink').on('click', function(d) {
 		var tab = this.innerHTML
@@ -627,7 +622,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 
 		//reset the mapFile to NUTS2
 		mapFile = mapFile2
-		
+
 		//load the new data and redraw map and chart
 		var pathName = "data/nutsData"+tab+".csv"
 		d3.csv(pathName, function(error, nutsDataNew){
@@ -641,8 +636,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 			nutsData = nutsDataNew
 			redrawMapNUTS(mapFile, nutsData, 2)
 			redrawPanel(nutsData, groups, defaultRegion)
-
-
 		})
 	})
 }

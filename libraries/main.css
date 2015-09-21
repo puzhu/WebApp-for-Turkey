@@ -4,6 +4,18 @@
 	margin-right:auto;
 	margin-top: 2vmax;
 }
+h3{
+	line-height: 1.2;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+p{
+	font-size: 10px;
+	font-family: Arial;
+	line-height: 1.2;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
 
 #mapControl{
 	float:left;
@@ -16,9 +28,8 @@ select{
 	float: left;
 	margin-top: 2%;
 	margin-left: 2%;
-	height: 2vw
+	height: 3vw
 }
-
 
 #mapContainer{
 	float: left;
@@ -30,14 +41,14 @@ select{
 	float:left;
 	margin-left: 2%;
 	width:100%;
-	height:3vw;
+	height:4vw;
 	/*box-shadow: 0 0 5px #888888;*/
 }
 
 #panelContainer{
 	float:right;
 	width: 50%;
-	height:30vw;
+	height:32vw;
 	/*box-shadow: 0 0 5px #888888;*/
 }
 
@@ -51,6 +62,7 @@ select{
 	stroke-width:1px;
 	stroke-linejoin:round;
 	stroke-linecap:round;
+	transition: stroke 300ms, stroke-width 300ms;
 }
 .country-boundary{
 	fill:none;
@@ -60,6 +72,12 @@ select{
 	stroke-linejoin:round;
 	stroke-linecap:round;
 }
+
+.hover{
+	stroke: red;
+	stroke-width:2px;
+}
+
 #legend{
 	float:left;
 	width:43%;
@@ -85,24 +103,33 @@ form{
     font-style: italic;
     font-weight: bold;
 }
-.bars{
 
+.hoverRects{
+	opacity: 0;
 }
+
 .subLabels{
     font-size:11px;
     font-family:Arial;
+    font-style: normal;
     text-anchor:end;
     alignment-baseline:hanging;
+    transition: font-style 300ms;
 }
 
 
-.xAxis path, .xAxis line{
+.xAxis path{
+	fill:none;
+	stroke:lightgrey;
+}
+.xAxis line{
  	fill:none;
- 	stroke: lightgrey;
+ 	stroke: rgb(200,200,200);
+ 	stroke-width: 1px;
  	shape-rendering: crispEdges;
  }
 
 .xAxis text{
- 	font-size: 12px;
- 	font-family: sans-serif;
+ 	font-size: 11px;
+ 	font-family: Arial;
  }
