@@ -1,3 +1,0 @@
-ogr2ogr nuts1New.shp nuts_level1.shp -t_srs "+proj=longlat +ellps=WGS84 +no_defs +towgs84=0,0,0"
-
-topojson -o test.json --simplify-proportion .05 -p adminLevel=LEVEL1_COD,name=LEVEL1_AD -- nuts1New.shp;
