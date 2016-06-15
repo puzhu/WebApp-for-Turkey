@@ -3,11 +3,6 @@
 <meta charset="utf-8">
 <head>
 <title>Turkey Survey Charts</title>
-<script src="libraries/d3/d3.min.js"></script>
-<script src="libraries/d3/topojson.v1.min.js"></script>
-<script src="libraries/d3/queue.v1.min.js"></script>
-<script src="libraries/jquery-2.2.4.min.js"></script>
-<script src="libraries/d3/d3.tip.v0.6.3.js"></script>
 <!-- <script src="libraries/bootstrap/js/bootstrap.min.js"></script> -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="css/tool-tip-style.css">
@@ -18,49 +13,103 @@
 </head>
 
 <body>
+	<div class="container-fluid">
+		<h2>Visualization of enterprise survey data from different regions in Turkey</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sit amet magna quis sem venenatis lacinia. Vivamus tortor turpis, tempus ac sem id, luctus rhoncus elit. Sed hendrerit volutpat odio, sit amet rutrum arcu porttitor sed. Sed auctor consequat placerat. Vestibulum libero est, finibus id nibh in, suscipit fringilla justo. Nulla facilisi. Sed sem odio, elementum ut diam nec, iaculis facilisis nulla. Suspendisse aliquet nulla id scelerisque pulvinar.</p>
+		<p>Fusce molestie tellus leo, id tristique felis dapibus sit amet. Aenean luctus sit amet velit nec iaculis. Aenean hendrerit imperdiet leo ac finibus. Nullam ornare eget ipsum vitae venenatis. Curabitur et pulvinar metus, sit amet tempor sem. Aliquam pharetra posuere ex, nec condimentum leo molestie non. Vestibulum in scelerisque turpis. Suspendisse vitae lacus ex. Praesent at est eget nisl tempus mattis.
+		</p>
+	</div>
+	<div class="container-fluid">
+		<nav class="navbar navbar-default">
 
-	<div id="main">
+			<div class="navbar-header">
+		    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		    </button>
+			</div>
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul  class="nav nav-pills nav-justified">
+					<li class="active"><a  href="#content" data-toggle="tab" class="tabLink">Corruption</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Crime</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Finance</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Firm Characteristics</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Gender</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Informality</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Infrastructure</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Innovation and Technology</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Performance</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Regulations and Taxes</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Overview</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Trade</a></li>
+					<li><a  href="#content" data-toggle="tab" class="tabLink">Workforce</a></li>
+				</ul>
+			</div>
+		</nav>
+	</div>
+	<div class="container-fluid">
+		<div class="tab-content clearfix">
+		  <div class="tab-pane active" id="content">
+        <div class="container-fluid">
+					<div class="row">
+						<div class="col-lg-6">
+							<div id="mapControl" class="row">
+								<h3>Average indicator values by region</h3>
+								<p>Hover to see values for region by groups</p>
+								<div id = "dropDown">
+									<select id="indicatorList"></select>
+								</div>
+							</div>
+							<div id="mapContainer" class="row text-center">
 
-		<ul class="nav nav-tabs">
-			<li class="active"><a href="#content" data-toggle="tab" class="tabLink">Corruption</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Crime</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Finance</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Firm Characteristics</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Gender</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Informality</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Infrastructure</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Innovation and Technology</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Performance</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Regulations and Taxes</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Trade</a></li>
-			<li><a href="#content" data-toggle="tab" class="tabLink">Workforce</a></li>
-		</ul>
+							</div>
+							<div id="legendAndButtons" class="row">
+								<div id="legend" class="col-xs-6">
 
-		<div class="tab-content">
-			<div class="tab-pane active" id="content">
-				<div id="mapControl">
-					<h3>Average indicator values by region</h3>
-					<p>Hover to see values for region by groups</p>
-					<div id = "dropDown">
-						<select id="indicatorList"></select>
-					</div>
-					<div id="mapContainer"></div>
-					<div id="legendAndButtons">
-						<div id="legend"></div>
-						<form action="">
-							<input type="radio" name="mapLevel" value=1>Nuts 1
-							<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
-							<input type="radio" name="mapLevel" value=3>Nuts 3
-						</form>
+								</div>
+								<div id="regionButtons" class="col-xs-6 text-center">
+									<form action="">
+										<input type="radio" name="mapLevel" value=1>Nuts 1
+										<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
+										<input type="radio" name="mapLevel" value=3>Nuts 3
+									</form>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<h3>Average indicator values by groupings</h3>
+							<p>Hover to see values for group on map</p>
+							<div id="panelContainer" class="text-center">
+
+							</div>
+						</div>
 					</div>
 				</div>
-				<div id="panelContainer">
-					<h3>Average indicator values by groupings</h3>
-					<p>Hover to see values for group on map</p>
-				</div>
+
 			</div>
 		</div>
 	</div>
+
+
+	<!-- Collapse small device menu on click -->
+	<script src="libraries/jquery-2.2.4.min.js"></script>
+	<script>
+		$(document).on('click','.navbar-collapse.in',function(e) {
+		if( $(e.target).is('a') && $(e.target).attr('class') != 'dropdown-toggle' ) {
+			console.log(this)
+				$(this).collapse('hide');
+		}
+		});
+	</script>
+	<script src="libraries/d3/d3.min.js"></script>
+	<script src="libraries/d3/topojson.v1.min.js"></script>
+	<script src="libraries/d3/queue.v1.min.js"></script>
+	<script src="libraries/jquery-2.2.4.min.js"></script>
+	<script src="libraries/d3/d3.tip.v0.6.3.js"></script>
+	<script src="libraries/bootstrap.min.js"></script>
+	<script src="js/main.js"></script>
 </body>
-<script src="scripts/main.js"></script>
+<!-- <script src="scripts/main.js"></script> -->
 </html>

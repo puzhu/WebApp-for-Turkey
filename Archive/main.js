@@ -1,4 +1,4 @@
-d3.selection.prototype.moveToFront = function() {
+ d3.selection.prototype.moveToFront = function() {
 	return this.each(function(){
 		this.parentNode.appendChild(this);
 	});
@@ -345,7 +345,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
           width: panelWidth + panelMargin.left + panelMargin.right
         })
         .attr("id", "panelSvg")
-      	.attr("transform", "translate(," + (panelMargin.top)+ ")");//moving the origin to the point where it starts
+      	.attr("transform", "translate(0," + (panelMargin.top)+ ")");//moving the origin to the point where it starts
       	//.call(makeResponsiveMap)
 
     //GET THE SCALES AND CHARTING FUNCTIONS READY
@@ -386,6 +386,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	    var mainCategoryPosition = panelMargin.top
 
 	    mainCategories.forEach(function(d, i) {
+				// console.log(mainCategoryPosition - mainFont - padding, d);
 	    	//Draw the main category Label
 	    	panel.append('text')
 	            .attr('class','catLabel')
@@ -521,6 +522,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList) {
 	//3. MOUSE-HOVER ON REGION
 	function mouseoverRegion(d) {
 		var hoverRegion = d.properties.adminLevel;
+		console.log(nutsData)
 		redrawPanel(nutsData, groups, hoverRegion)
 		mapTip.show(d)
 		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', true).moveToFront()
