@@ -139,7 +139,29 @@ fill: steelblue;
 transition: width 500ms;
 }
 
-.bar:hover {
+
+
+.hoverRect{
+  fill: black;
+  opacity: 0;
+  cursor: auto;
+  /*stroke: red;
+  stroke-width: 1px;*/
+}
+
+.hoverRect:hover {
 fill: brown;
 transition: fill 1000ms;
+}
+/*Bar dot and label*/
+.dots{
+  fill: steelblue;
+  opacity: 0.4;
+  stroke: darkblue;
+  stroke-width: 2px;
+}
+.barText{
+  text-anchor: middle;
+  alignment-baseline: middle;
+  font-size: 11px;
 }
