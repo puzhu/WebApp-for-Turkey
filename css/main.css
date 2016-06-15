@@ -1,69 +1,74 @@
-#main{
-	width:90%;
-	margin-left:auto;
-	margin-right:auto;
-	margin-top: 2vmax;
-}
-h3{
-	line-height: 1.2;
-	margin: 0px 0px 0px 0px;
-	padding: 0px 0px 0px 0px;
-}
-p{
-	font-size: 10px;
-	font-family: Arial;
-	line-height: 1.2;
-	margin: 0px 0px 0px 0px;
-	padding: 0px 0px 0px 0px;
+body {
+  padding : 5px ;
+
 }
 
+.tab-content {
+  /*color : white;*/
+  /*background-color: #F1EFF2;*/
+  padding : 5px 15px;
+}
+.nav-pills > li > a {
+  border-radius: 5%;
+  /*border: 1px solid red;*/
+
+}
+
+.navbar {
+  margin-bottom: 0;
+  /*border: none;*/
+  padding: 0;
+  /*border: 1px solid blue;*/
+  background-color: #fff;
+}
+
+.navbar .nav-pills > li > a {
+    height: 75px;
+    margin: auto;
+    /*background-color: #F1EFF2;*/
+}
+
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:focus {
+  color: black;
+  background-color: #fcd900;
+}
+
+.nav-pills > li.active > a:hover {
+    background-color: #efcb00;
+    color:black;
+}
+
+
+/*Drawing area css*/
 #mapControl{
-	float:left;
-	width:48%;
-	height:30vw;
-	/*box-shadow: 0 0 5px #888888;*/
-}
+  border: 1px solid blue;
 
-select{
-	float: left;
-	margin-top: 2%;
-	margin-left: 2%;
-	height: 3vw
+}
+#legend {
+  height: 50px;
+  /*width: 50%*/
 }
 
 #mapContainer{
-	float: left;
-	width: 100%;
-	height: 25vw;
-	/*box-shadow: 0 0 5px #888888;*/
+  border: 1px solid blue;
+  height: 400px;
 }
+
 #legendAndButtons{
-	float:left;
-	margin-left: 2%;
-	width:100%;
-	height:4vw;
-	/*box-shadow: 0 0 5px #888888;*/
+  border: 1px solid blue;
 }
 
 #panelContainer{
-	float:right;
-	width: 50%;
-	height:32vw;
-	/*box-shadow: 0 0 5px #888888;*/
+  border: 1px solid blue;
+  height: 500px;
+}
+/*Map Css*/
+.turkeyMap{
+  /*transition: fill 10000ms*/
 }
 
-
-
-
-/*Map CSS*/
-.nuts-boundary{
-	fill:none;
-	stroke: grey; /*rgb(160,160,160);*/
-	stroke-width:1px;
-	stroke-linejoin:round;
-	stroke-linecap:round;
-	transition: stroke 300ms, stroke-width 300ms;
-}
+/*Map Boundary Css*/
 .country-boundary{
 	fill:none;
 	stroke: black; /*rgb(160,160,160);*/
@@ -73,51 +78,21 @@ select{
 	stroke-linecap:round;
 }
 
+.nuts-boundary{
+	fill:none;
+	stroke: grey; /*rgb(160,160,160);*/
+	stroke-width:1px;
+	stroke-linejoin:round;
+	stroke-linecap:round;
+	transition: stroke 300ms, stroke-width 300ms;
+}
+
 .hover{
 	stroke: red;
 	stroke-width:2px;
 }
 
-#legend{
-	float:left;
-	width:43%;
-	height:100%;
-}
-
-form{
-	width:54%;
-	float: right;
-}
-
-.legendLabels{
-	font-family:Arial;
-	font-size: 12px;
-	alignment-baseline:hanging;
-	text-anchor:end;
-}
-/*Panel CSS*/
-.catLabel{
-    font-family:Arial;
-    /*text-anchor:end;*/
-    alignment-baseline:hanging;
-    font-style: italic;
-    font-weight: bold;
-}
-
-.hoverRects{
-	opacity: 0;
-}
-
-.subLabels{
-    font-size:11px;
-    font-family:Arial;
-    font-style: normal;
-    text-anchor:end;
-    alignment-baseline:hanging;
-    transition: font-style 300ms;
-}
-
-
+/*Panel X- Axis*/
 .xAxis path{
 	fill:none;
 	stroke:lightgrey;
@@ -133,3 +108,38 @@ form{
  	font-size: 11px;
  	font-family: Arial;
  }
+
+/*Panel Elements*/
+.hoverRects{
+	opacity: 0;
+}
+
+.catLabel{
+   font-family:Arial;
+   font-size: 16px;
+   alignment-baseline:hanging;
+   font-style: italic;
+   font-weight: bold;
+   cursor: default;
+}
+.subCatLabel{
+  font-family:Arial;
+  font-size: 10px;
+  font-family:Arial;
+  font-style: normal;
+  text-anchor:end;
+  alignment-baseline:hanging;
+  transition: font-style 300ms;
+  /*overflow-wrap: break-word;
+  word-wrap: break-word;*/
+}
+/*Bar CSS*/
+.bar {
+fill: steelblue;
+transition: width 500ms;
+}
+
+.bar:hover {
+fill: brown;
+transition: fill 1000ms;
+}
