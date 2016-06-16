@@ -678,17 +678,17 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	function mouseoverBar(d) {
 		mapFile = setMapFile(mapFile1, mapFile2, mapFile3);
 		redrawMap(mapFile, nutsData, d.groupID);
-		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'brown'})
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'brown'}).style('stroke-width', '3px')
 		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'brown'})
-		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'bold')
-		d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'bold')
+		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'bold', 'font-size': '12px'})
+		// d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'bold')
 	}
 	//
 	function mouseoutBar(d) {
 		redrawMap(mapFile, nutsData, 2);
-		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).attr({r: .5 * barWidth}).style({fill: 'steelblue'})
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'steelblue'}).style('stroke-width', '2px')
 		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'steelblue'})
 		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'normal')
-		d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'normal')
+		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'normal', 'font-size': '11px'})
 	}
 }
