@@ -1,73 +1,91 @@
 body {
   padding : 5px ;
-
 }
 
 .tab-content {
-  /*color : white;*/
-  /*background-color: #F1EFF2;*/
   padding : 5px 15px;
 }
-.nav-pills > li > a {
-  border-radius: 5%;
-  /*border: 1px solid red;*/
 
-}
 
 .navbar {
-  margin-bottom: 0;
-  /*border: none;*/
+  margin-bottom: 15px;
+  border: none;
   padding: 0;
-  /*border: 1px solid blue;*/
   background-color: #fff;
+  /*text-anchor: middle;*/
+}
+
+.navbar .nav-pills > li{
+  padding-bottom: 15px;
 }
 
 .navbar .nav-pills > li > a {
     height: 75px;
     margin: auto;
-    /*background-color: #F1EFF2;*/
+    font-size: 16px;
 }
 
 
 .nav-pills > li.active > a, .nav-pills > li.active > a:focus {
-  color: black;
-  background-color: #fcd900;
+  color: white;
+  border-radius: 5%;
+  background-color: #5b5e5f;
 }
 
 .nav-pills > li.active > a:hover {
-    background-color: #efcb00;
-    color:black;
+  background-color: #c7c7c7;
+  color:white;
+
+}
+.nav-pills > li > a:hover{
+  /*border-radius: 5%;*/
+  border-radius: 15%;
 }
 
+
+
+/*Map Title CSS*/
+
+#group, #nuts {
+  font-size: 1.2em;
+  font-weight: bold;
+}
 
 /*Drawing area css*/
 #mapControl{
-  border: 1px solid blue;
-
+  /*border: 1px solid blue;*/
 }
+
 #legend {
   height: 50px;
   /*width: 50%*/
 }
 
 #mapContainer{
-  border: 1px solid blue;
+  /*border: 1px solid blue;*/
   height: 400px;
 }
 
 #legendAndButtons{
-  border: 1px solid blue;
+  /*border: 1px solid blue;*/
 }
 
 #panelContainer{
-  border: 1px solid blue;
-  height: 500px;
+  /*border: 1px solid blue;*/
+  height: 480px;
 }
 /*Map Css*/
 .turkeyMap{
   /*transition: fill 10000ms*/
 }
 
+/*Legend CSS*/
+.legendLabels{
+	font-family:Arial;
+	font-size: 12px;
+	alignment-baseline:hanging;
+	text-anchor:end;
+}
 /*Map Boundary Css*/
 .country-boundary{
 	fill:none;
@@ -108,6 +126,10 @@ body {
  	font-size: 11px;
  	font-family: Arial;
  }
+/*Tool Tip*/
+#popUp {
+  font-size: 14px;
+}
 
 /*Panel Elements*/
 .hoverRects{
@@ -164,4 +186,119 @@ transition: fill 1000ms;
   text-anchor: middle;
   alignment-baseline: middle;
   font-size: 11px;
+}
+
+
+/*Make the navbar collapse earlier*/
+@media (max-width: 1199px) {
+    .navbar-header {
+        float: none;
+    }
+    .navbar-toggle {
+        display: block;
+    }
+    .navbar-collapse {
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .navbar-collapse.collapse {
+        display: none!important;
+    }
+    .navbar-nav {
+        float: none!important;
+        margin: 7.5px -15px;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .navbar-text {
+        float: none;
+        margin: 15px 0;
+    }
+    /* since 3.1.0 */
+    .navbar-collapse.collapse.in {
+        display: block!important;
+    }
+    .collapsing {
+        overflow: hidden!important;
+    }
+}
+
+
+
+/*Styling the map controls*/
+  /*select*/
+
+select{
+  max-width: 350px;
+}
+label.indDropdown select {
+	padding: 10px 42px 10px 10px;
+	background: #f8f8f8;
+	color: #444;
+	border: 1px solid #aaa;
+	border-radius: 0;
+	display: inline-block;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	cursor: pointer;
+	outline: none;
+}
+label.indDropdown select:-moz-focusring {
+	color: transparent;
+	text-shadow: 0 0 0 #444;
+}
+label.indDropdown select::-ms-expand {
+	display: none;
+}
+label.indDropdown:before {
+	content: '';
+	right: 5px;
+	top: 2px;
+	width: 30px;
+	height: 33px;
+	background: #f8f8f8;
+	position: absolute;
+	pointer-events: none;
+	display: block;
+}
+label.indDropdown { position: relative; }
+label.indDropdown:after {
+	content: '>';
+	font: 20px Consolas, monospace;
+	color: #444;
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	transform: rotate(90deg);
+	right: 0px;
+	top: 5px;
+	/*border-bottom: 3px solid #aaa;*/
+	position: absolute;
+	pointer-events: none;
+	width: 35px;
+	padding: 0 0 5px 0;
+	text-indent: 15px;
+}
+@media screen\0 {
+	label.indDropdown:after {
+		width: 38px;
+		text-indent: 15px;
+		right: 0;
+	}
+}
+@media screen and (min--moz-device-pixel-ratio:0) {
+	label.indDropdown select { padding-right: 40px; }
+	label.indDropdown:before { right: 6px; }
+	label.indDropdown:after {
+		text-indent: 14px;
+		right: 6px;
+		top: -5px;
+		width: 36px;
+	}
 }

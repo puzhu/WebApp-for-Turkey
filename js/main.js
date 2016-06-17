@@ -240,9 +240,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	//Create the map tool tip
   var mapTip = d3.tip()
     .attr('class', 'd3-tip')
+		.attr('id', 'popUp')
     .offset([10, 5])
       .direction('e')
-      .html(function(d) {return "<strong>Name:</strong> <span style='color:silver'>" + d.properties.name + "</span>" + "<br>" +
+      .html(function(d) {return "<strong>Region:</strong> <span style='color:silver'>" + d.properties.name + "</span>" + "<br>" +
         "<strong>Value:</strong> <span style='color:silver'>" + d.properties.value + "</span>" })
 
 	// Setting the default region for the bar chart as Turkey
@@ -277,7 +278,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	// Aesthetics of the bar chart
 	var barWidth = 16;
 	var barPadding = 2;//padding between bars
-	var categoryPadding = 10;//padding between the main category sections
+	var categoryPadding = 8;//padding between the main category sections
 	var mainCategoryPosition = 0; //the loop updates this value based on number of subCategories in previos
 
 	/*
@@ -306,6 +307,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	$('input:radio').on('click', function(e) {
 		mapFile = setMapFile(mapFile1, mapFile2, mapFile3);
 		redrawMap(mapFile, nutsData, 2);
+		document.getElementById('nuts').innerHTML = "Nuts " + Number($("input[type='radio'][name='mapLevel']:checked").val());
 	});
 
 	//2. Redraw map and panel based on new indiator
@@ -348,6 +350,44 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 		})
 	})
 
+	/*
+	#################################################
+	SECTION : DEFINE MOUSEOVER FUNCTIONS
+	To-Dos: 1. Figure out a better cursor default for hover events
+	#################################################
+	*/
+	// Mouse interactions on map
+	function mouseoverRegion(d) {
+		var hoverRegion = d.properties.adminLevel;
+		redrawBarChart(nutsData, groups, hoverRegion);
+		mapTip.show(d);
+		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', true).moveToFront();
+	}
+	function mouseoutRegion(d) {
+		var hoverRegion = d.properties.adminLevel;
+		redrawBarChart(nutsData, groups, defaultRegion);
+		mapTip.hide(d);
+		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', false);
+	}
+
+	// Mouse interactionS on bar chart
+	function mouseoverBar(d) {
+		mapFile = setMapFile(mapFile1, mapFile2, mapFile3);
+		redrawMap(mapFile, nutsData, d.groupID);
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'darkred'}).style('stroke-width', '4px')
+		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'brown'})
+		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'bold', 'font-size': '12px'})
+		document.getElementById('group').innerHTML = d.subGroup;
+		// d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'bold')
+	}
+	//
+	function mouseoutBar(d) {
+		redrawMap(mapFile, nutsData, 2);
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'darkblue'}).style('stroke-width', '2px')
+		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'steelblue'})
+		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'normal', 'font-size': '11px'})
+		document.getElementById('group').innerHTML = "ALL";
+	}
 	/*
 	#################################################
 	SECTION 3.5: THE DRAW MAP FUNCTION
@@ -654,41 +694,5 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 			.on('mouseout', mouseoutBar)
 	}
 
-	/*
-	#################################################
-	SECTION 7: DEFINE MOUSEOVER FUNCTIONS
-	To-Dos: 1. Figure out a better cursor default for hover events
-	#################################################
-	*/
-	// Mouse interactions on map
-	function mouseoverRegion(d) {
-		var hoverRegion = d.properties.adminLevel;
-		redrawBarChart(nutsData, groups, hoverRegion);
-		mapTip.show(d);
-		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', true).moveToFront();
-	}
-	function mouseoutRegion(d) {
-		var hoverRegion = d.properties.adminLevel;
-		redrawBarChart(nutsData, groups, defaultRegion);
-		mapTip.hide(d);
-		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', false);
-	}
 
-	// Mouse interactionS on bar chart
-	function mouseoverBar(d) {
-		mapFile = setMapFile(mapFile1, mapFile2, mapFile3);
-		redrawMap(mapFile, nutsData, d.groupID);
-		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'brown'}).style('stroke-width', '3px')
-		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'brown'})
-		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'bold', 'font-size': '12px'})
-		// d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'bold')
-	}
-	//
-	function mouseoutBar(d) {
-		redrawMap(mapFile, nutsData, 2);
-		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'steelblue'}).style('stroke-width', '2px')
-		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'steelblue'})
-		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'normal')
-		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'normal', 'font-size': '11px'})
-	}
 }
