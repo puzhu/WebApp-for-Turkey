@@ -13,11 +13,10 @@
 </head>
 
 <body>
-	<div class="container-fluid">
-		<h2>Visualization of enterprise survey data from different regions in Turkey</h2>
-		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sit amet magna quis sem venenatis lacinia. Vivamus tortor turpis, tempus ac sem id, luctus rhoncus elit. Sed hendrerit volutpat odio, sit amet rutrum arcu porttitor sed. Sed auctor consequat placerat. Vestibulum libero est, finibus id nibh in, suscipit fringilla justo. Nulla facilisi. Sed sem odio, elementum ut diam nec, iaculis facilisis nulla. Suspendisse aliquet nulla id scelerisque pulvinar.</p>
-		<p>Fusce molestie tellus leo, id tristique felis dapibus sit amet. Aenean luctus sit amet velit nec iaculis. Aenean hendrerit imperdiet leo ac finibus. Nullam ornare eget ipsum vitae venenatis. Curabitur et pulvinar metus, sit amet tempor sem. Aliquam pharetra posuere ex, nec condimentum leo molestie non. Vestibulum in scelerisque turpis. Suspendisse vitae lacus ex. Praesent at est eget nisl tempus mattis.
-		</p>
+	<div class="container-fluid" id='explainText'>
+		<h2>Visualization of enterprise survey data from Turkey</h2>
+		<p>This dashboard visualizes enterprise survey data that was collected during the period 2015-16. The data was collected to be representative, for each of the 108 indicators that are split between 13 topics, at the three regional levels (Nuts 1, Nut 2, and Nuts 3) and 18 sub-groups.</p>
+		<p>Along with basic actions such as selecting, a new topic (tabs) or indicator (dropdown menu) or the different regional levels (Nuts 1, Nut 2, and Nuts 3), users can dive deep into this data by interacting with the charts. Hovering on a region on the map will trigger changes on the bar chart, which will show the split of the data between the different sub-groups for that particular region (instead of just aggregate estimates for all of Turkey). Similary, hovering over the bar chart will allow users to observe the regional variations for a particular sub-grouping, for instance, the percentage of female led firms that experience bribe payments across different regions</p>
 	</div>
 	<div class="container-fluid">
 		<nav class="navbar navbar-default">
@@ -52,7 +51,7 @@
 		<div class="tab-content clearfix">
 		  <div class="tab-pane active" id="content">
         <div class="container-fluid">
-					<div class="row">
+					<div class="row" id="allCharts">
 						<div class="col-lg-6">
 							<div id="mapControl" class="row">
 									<p><span><label class='indDropdown'><select id="indicatorList"></select></label></span>, for <span id='group'>ALL</span> firms, in <span id='nuts'>Nuts 2</span> regions.</p>
@@ -72,7 +71,9 @@
 							</div>
 						</div>
 						<div class="col-lg-6">
-							<h4 class="text-center">Data by Subgroups</h4>
+							<h4 id='panelHeading'>
+								<span>Data by Subgroups for </span><span id='regionName'>Turkey</span>
+							</h4>
 							<div id="panelContainer" class="text-center">
 
 							</div>

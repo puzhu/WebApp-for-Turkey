@@ -82,10 +82,11 @@ function wrap(text, width) {
 function setBins(max,min) {// calculates the bins for the color domain in the map
 	var bounds = [];
 	for (var i=1;i<=5;i++) { // create 5 equally sized bins between min*.95 and max*1.05
-		// bounds.push(min*.95+(((max*1.05)-(min*.95))*(i/5)));
-		bounds.push(min+(((100.01)-(min))*(i/5)));
+		var tempVal = Math.round(min * .95 + (((max * 1.05) - (min * .95)) * (i / 5)))
+		bounds.push(tempVal);
+		// bounds.push(min+(((100.01)-(min))*(i/5)));
 	}
-	bounds = [20,40,60,80,100.01]
+	// bounds = [20,40,60,80,100.01]
 	return bounds;
 }
 
@@ -215,7 +216,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 
 	//Create map the canvas
   var mapContainerSize = d3.select('#mapContainer').node().getBoundingClientRect()
-  var mapMargin = {top: 20, right: 10, bottom: 20, left: 10};
+  var mapMargin = {top: 10, right: 10, bottom: 10, left: 10};
   var mapWidth = mapContainerSize.width - mapMargin.right - mapMargin.left; //Chart width
   var mapHeight = mapContainerSize.height - mapMargin.top - mapMargin.bottom; //Chart height
 
@@ -230,7 +231,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 
 	//Set the map projection and call it
   var mapProjection = d3.geo.mercator()
-    .center([19.5,72.8])
+    .center([19.5,72.2])
     .scale(750)
     .rotate([0,0,5.5])
     .translate([mapWidth/2, mapHeight/2]);
@@ -250,6 +251,14 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	// Setting the default region for the bar chart as Turkey
 	var defaultRegion = "TR"
 
+	var legendContainerSize = d3.select('#legend').node().getBoundingClientRect()
+	var rectWidth = legendContainerSize.width/color.range().length
+	var rectHeight = legendContainerSize.height/2;
+	var legend = d3.select('#legend').append('svg')
+		.attr({
+						height: legendContainerSize.height,
+						width: legendContainerSize.width
+					})
 	/*
 	#################################################
 	SECTION 3.2: SETTING UP THE GLOBAL VARIABLES AND DRAWING AREAS FOR THE BAR CHART
@@ -258,7 +267,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	*/
 	//Create the bar chart canvas
   var panelContainerSize = d3.select('#panelContainer').node().getBoundingClientRect();
-  var panelMargin = {top: 20, right: 40, bottom: 20, left: 200};//large left margin for labels
+  var panelMargin = {top: 20, right: 20, bottom: 20, left: 260};//large left margin for labels
   var panelWidth = panelContainerSize.width - panelMargin.right - panelMargin.left; //Chart width
   var panelHeight = panelContainerSize.height - panelMargin.top - panelMargin.bottom; //Chart height
   var panel = d3.select('#panelContainer').append('svg') //http://bl.ocks.org/mbostock/3019563
@@ -291,9 +300,6 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 
 	//Draw the map
 	drawMap(mapFile, nutsData);
-
-	//Draw the legend
-	drawMapLegend();
 
 	//Draw the bar Chart
 	drawBarChart(nutsData, groups, defaultRegion);
@@ -363,23 +369,25 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 		redrawBarChart(nutsData, groups, hoverRegion);
 		mapTip.show(d);
 		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', true).moveToFront();
+		document.getElementById('regionName').innerHTML = d.properties.name + " region";
 	}
 	function mouseoutRegion(d) {
 		var hoverRegion = d.properties.adminLevel;
 		redrawBarChart(nutsData, groups, defaultRegion);
 		mapTip.hide(d);
 		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', false);
+		document.getElementById('regionName').innerHTML = "Turkey"
 	}
 
 	// Mouse interactionS on bar chart
 	function mouseoverBar(d) {
 		mapFile = setMapFile(mapFile1, mapFile2, mapFile3);
 		redrawMap(mapFile, nutsData, d.groupID);
-		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'darkred'}).style('stroke-width', '4px')
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'darkred'}).style('stroke-width', '2px')
 		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'brown'})
-		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'bold', 'font-size': '12px'})
+		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'bold', 'font-size': '11px'})
 		document.getElementById('group').innerHTML = d.subGroup;
-		// d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'bold')
+		d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'bold')
 	}
 	//
 	function mouseoutBar(d) {
@@ -387,6 +395,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'darkblue'}).style('stroke-width', '2px')
 		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'steelblue'})
 		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'normal', 'font-size': '11px'})
+		d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'normal')
 		document.getElementById('group').innerHTML = "ALL";
 	}
 	/*
@@ -394,22 +403,22 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	SECTION 3.5: THE DRAW MAP FUNCTION
 	To-Dos: 1. Play around with the projection to change the orientation of the map
 					2. Experiment with a new color scheme
-					3. Change the map file to use the mapfile setti
+					3. Change the range to data driven
 	#################################################
 	*/
-	function drawMap(mapFile2, nutsData){
+	function drawMap(mapFile, nutsData){
 	  //Set the domains and ranges
 	  var filteredData = dataFilter(nutsData, true, 2) //mapOrPanel is set to trues
-	  var max = 100.01;
-	  var min = 0;
-	  var bounds = setBins(max,min);
 
+	  var max = d3.max(filteredData, function(d){return d.value;});
+	  var min = d3.min(filteredData, function(d){return d.value;});
+	  var bounds = setBins(max,min);
 		//set the domain for the color scale
 		color.domain(bounds);
 
 
 	  //Getting the map data ready
-	  var mapFile = mapFile2 //hardoded to use the nuts2 level as the default
+	  // var mapFile = mapFile2 //hardoded to use the nuts2 level as the default
 	  var mapKey = Object.keys(mapFile.objects)//Pulls out the key associated with the map features
 	  var mapFeatures = topojson.feature(mapFile, mapFile.objects[mapKey]).features
 	  mapFeatures = addInditoMap(filteredData, mapFeatures)
@@ -449,6 +458,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	      .attr("id",function(e) {return d});
 	  });
 
+		drawMapLegend(bounds);
 	}
 
 	/*
@@ -457,15 +467,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	To-Dos: 1: Prettify the legend by making it smaller
 	#################################################
 	*/
-	function drawMapLegend(){
-	  var legendContainerSize = d3.select('#legend').node().getBoundingClientRect()
-		var rectWidth = legendContainerSize.width/color.range().length
-	  var rectHeight = legendContainerSize.height/2;
-		var legend = d3.select('#legend').append('svg')
-			.attr({
-		          height: legendContainerSize.height,
-		          width: legendContainerSize.width
-		        })
+	function drawMapLegend(bounds){
 		legend.append('g')
 			.selectAll('rect')
 			.data(color.range())
@@ -481,8 +483,8 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 			.style('stroke', 'white')
 			.style('stroke-width', '0.6px')
 
-	  var legendText = [20,40,60,80,100]
-		var legendLabels = legend.append('g')
+	  var legendText = bounds;
+		legend.append('g')
 			.selectAll('.legendLabels')
 			.data(legendText)
 			.enter()
@@ -508,18 +510,18 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 		var groupedData = groupData(nutsData, groups, region); //the default region is set to national ("TR") for panel view
 
 	  //set the xScale and axis (Should be based on data)
-	  var maxValue = 100;
-	  var minValue = 0;
+	  var maxValue = d3.max(groupedData, function(d) {return d.value;}) * 1.05;
+	  var minValue = d3.min(groupedData, function(d) {return d.value;}) * 0.95;
 		xScale.domain([minValue, maxValue])
 		var numberTicks = Math.floor((maxValue - minValue)/15);
 	  xAxis.scale(xScale).ticks(numberTicks)
 
 	  //draw the xAxis
-	  var xAxisLine = panel.append('g')
+	  panel.append('g')
 	    .attr('class', 'xAxis')
 	    .call(xAxis)
 	    .attr('transform', 'translate(0,'+ (panelHeight) + ")")
-	    .style('cursor', 'default')
+	    .style('cursor', 'default');
 
 	  //Drawing the bar chart
 		/*Iterate through the main categories and use the count of subcategories to position the main category labels. The bar should look like it has distinct sections and should be easy to understand.*/
@@ -621,9 +623,9 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	function redrawMap(mapFile, nutsData, groupID){//color, map, mapPath
 	  filteredData = dataFilter(nutsData, true, groupID)
 
-	  var max = 100.01;
-	  var min = 0;
-	  bounds = setBins(max,min);
+		var max = d3.max(filteredData, function(d){return d.value;});
+	  var min = d3.min(filteredData, function(d){return d.value;});
+	  var bounds = setBins(max,min);
 	  color.domain(bounds)
 
 	  var mapKey = Object.keys(mapFile.objects)
@@ -656,6 +658,10 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	      })
 	      .attr("id",function(e) {return d});
 	  });
+
+		var legendText = bounds;
+		d3.selectAll('.legendLabels').data(legendText)
+				.text(function(d){return Math.ceil(d)})
 	}
 
 	/*
@@ -669,11 +675,14 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 		var groupedData = groupData(nutsData, groups, region);
 
 		//set the xScale and axis (Should be based on data)
-	  var maxValue = 100;
-	  var minValue = 0;
+	  var maxValue = d3.max(groupedData, function(d) {return d.value;}) * 1.05;;
+	  var minValue = d3.min(groupedData, function(d) {return d.value;}) * 0.95;
 		xScale.domain([minValue, maxValue]);
 		var numberTicks = Math.floor((maxValue - minValue)/15);
 	  xAxis.scale(xScale).ticks(numberTicks);
+		d3.selectAll('.xAxis')
+				.transition().duration(200).ease("exp")
+				.call(xAxis);
 
 		d3.selectAll('.bar')
 			.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
