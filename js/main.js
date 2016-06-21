@@ -1,6 +1,7 @@
 /*
 #################################################
 SECTION 1: ADDING ALL THE HELPER FUNCTIONS
+To-Dos: 1. Use gulp to setup the require functionality of node to load a helper file separately
 #################################################
 */
 //Move elements to the front
