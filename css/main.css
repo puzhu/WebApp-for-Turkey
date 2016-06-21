@@ -8,28 +8,37 @@ body {
 
 
 .navbar {
-  margin-bottom: 15px;
+  margin-bottom: 0!important;
   border: none;
-  padding: 0;
   background-color: #fff;
   /*text-anchor: middle;*/
 }
 
 .navbar .nav-pills > li{
-  padding-bottom: 15px;
+  margin-bottom: 0px;
+  /*border-bottom: 0.5px lightblue solid;*/
 }
 
 .navbar .nav-pills > li > a {
     height: 75px;
     margin: auto;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 
 .nav-pills > li.active > a, .nav-pills > li.active > a:focus {
-  color: white;
-  border-radius: 5%;
-  background-color: #5b5e5f;
+  color: black;
+  font-weight: bold;
+  /*border-radius: 5%;*/
+  background-color: #F0F0F0;
+  /*background-color: #5b5e5f;*/
+  /*border-top: 2px lightblue solid;
+  border-left: 2px lightblue solid;
+  border-right: 2px lightblue solid;*/
+  border-bottom: none;
+  margin-bottom: 0px;
+  /*padding-bottom: 10px;*/
+
 }
 
 .nav-pills > li.active > a:hover {
@@ -37,15 +46,21 @@ body {
   color:white;
 
 }
-.nav-pills > li > a:hover{
-  /*border-radius: 5%;*/
-  border-radius: 15%;
-}
 
 
 
 /*Map Title CSS*/
-
+#explainText{
+  padding-left: 30px;
+}
+#allCharts {
+  margin-top: -6px;
+  background-color: #F0F0F0;
+  padding: 10px 8px;
+}
+#panelHeading{
+  padding-left: 30px;
+}
 #group, #nuts {
   font-size: 1.2em;
   font-weight: bold;
@@ -54,6 +69,7 @@ body {
 /*Drawing area css*/
 #mapControl{
   /*border: 1px solid blue;*/
+  height: 75px;
 }
 
 #legend {
@@ -63,6 +79,7 @@ body {
 
 #mapContainer{
   /*border: 1px solid blue;*/
+
   height: 400px;
 }
 
@@ -71,7 +88,7 @@ body {
 }
 
 #panelContainer{
-  /*border: 1px solid blue;*/
+  margin-left: 40px;
   height: 480px;
 }
 /*Map Css*/
@@ -108,6 +125,7 @@ body {
 .hover{
 	stroke: red;
 	stroke-width:2px;
+  cursor: pointer;
 }
 
 /*Panel X- Axis*/
@@ -132,9 +150,6 @@ body {
 }
 
 /*Panel Elements*/
-.hoverRects{
-	opacity: 0;
-}
 
 .catLabel{
    font-family:Arial;
@@ -166,14 +181,12 @@ transition: width 500ms;
 .hoverRect{
   fill: black;
   opacity: 0;
-  cursor: auto;
-  /*stroke: red;
-  stroke-width: 1px;*/
 }
 
 .hoverRect:hover {
 fill: brown;
 transition: fill 1000ms;
+cursor: pointer;
 }
 /*Bar dot and label*/
 .dots{
@@ -206,7 +219,7 @@ transition: fill 1000ms;
     }
     .navbar-nav {
         float: none!important;
-        margin: 7.5px -15px;
+        /*margin: 7.5px -15px;*/
     }
     .navbar-nav>li {
         float: none;
@@ -217,7 +230,7 @@ transition: fill 1000ms;
     }
     .navbar-text {
         float: none;
-        margin: 15px 0;
+        /*margin: 15px 0;*/
     }
     /* since 3.1.0 */
     .navbar-collapse.collapse.in {
@@ -231,10 +244,15 @@ transition: fill 1000ms;
 
 
 /*Styling the map controls*/
+input[type="radio"] {
+  margin-right: 5px;
+  margin-left: 15px;
+}
+
   /*select*/
 
 select{
-  max-width: 350px;
+  max-width: 380px;
 }
 label.indDropdown select {
 	padding: 10px 42px 10px 10px;
