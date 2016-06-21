@@ -1,6 +1,7 @@
 /*
 #################################################
 SECTION 1: ADDING ALL THE HELPER FUNCTIONS
+To-Dos: 1. Use gulp to setup the require functionality of node to load a helper file separately
 #################################################
 */
 //Move elements to the front
@@ -203,7 +204,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	mapFile = setMapFile(mapFile1, mapFile2, mapFile3);
 	/*
 	#################################################
-	SECTION 3.1: SETTING UP THE GLOBAL VARIABLES AND DRAWING AREAS
+	SECTION 3.1: SETTING UP THE GLOBAL VARIABLES AND DRAWING AREAS FOR THE MAP
 	To-Dos: 1.
 	#################################################
 	*/
@@ -240,13 +241,21 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	//Create the map tool tip
   var mapTip = d3.tip()
     .attr('class', 'd3-tip')
+		.attr('id', 'popUp')
     .offset([10, 5])
       .direction('e')
-      .html(function(d) {return "<strong>Name:</strong> <span style='color:silver'>" + d.properties.name + "</span>" + "<br>" +
+      .html(function(d) {return "<strong>Region:</strong> <span style='color:silver'>" + d.properties.name + "</span>" + "<br>" +
         "<strong>Value:</strong> <span style='color:silver'>" + d.properties.value + "</span>" })
 
 	// Setting the default region for the bar chart as Turkey
 	var defaultRegion = "TR"
+
+	/*
+	#################################################
+	SECTION 3.2: SETTING UP THE GLOBAL VARIABLES AND DRAWING AREAS FOR THE BAR CHART
+	To-Dos: 1.
+	#################################################
+	*/
 	//Create the bar chart canvas
   var panelContainerSize = d3.select('#panelContainer').node().getBoundingClientRect();
   var panelMargin = {top: 20, right: 40, bottom: 20, left: 200};//large left margin for labels
@@ -264,43 +273,42 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	var xScale = d3.scale.linear() //the xScale is set based on the values of the indicator
 		.range([0, panelWidth]);
 
-
 	var xAxis = d3.svg.axis()
     .orient('bottom')
 
-	// var barTip = d3.tip()
-	// 	.attr('class', 'd3-tip')
-	// 	.offset([0, 0])
-	// 		.direction('w')
-	// 		.html(function(e) {return "<strong>Name:</strong> <span style='color:silver'>" + e.subGroup + "</span>" + "<br>" +
-	// 			"<strong>Value:</strong> <span style='color:silver'>" + e.value + "</span>" })
+	// Aesthetics of the bar chart
+	var barWidth = 16;
+	var barPadding = 2;//padding between bars
+	var categoryPadding = 8;//padding between the main category sections
+	var mainCategoryPosition = 0; //the loop updates this value based on number of subCategories in previos
 
 	/*
 	#################################################
-	SECTION 3.2: DRAW THE DEFAULT VIEW
+	SECTION 3.3: DRAW THE DEFAULT VIEW
 	To-Dos: 1.
 	#################################################
 	*/
 
 	//Draw the map
-	drawMap(mapFile, nutsData, color, map, mapPath);
+	drawMap(mapFile, nutsData);
 
 	//Draw the legend
-	drawMapLegend(color);
+	drawMapLegend();
 
 	//Draw the bar Chart
-	drawBarChart(nutsData, groups, panelMargin, panelWidth, panelHeight, panel, defaultRegion, xScale, xAxis);
+	drawBarChart(nutsData, groups, defaultRegion);
 
 	/*
 	#################################################
-	SECTION 3: REDRAW BASED ON LISTENERS
+	SECTION 3.4: REDRAW BASED ON LISTENERS
 	To-Dos: 1.
 	#################################################
 	*/
 	// Redraw the map based on the radio button
 	$('input:radio').on('click', function(e) {
 		mapFile = setMapFile(mapFile1, mapFile2, mapFile3);
-		redrawMap(mapFile, nutsData, 2, color, map, mapPath, defaultRegion);
+		redrawMap(mapFile, nutsData, 2);
+		document.getElementById('nuts').innerHTML = "Nuts " + Number($("input[type='radio'][name='mapLevel']:checked").val());
 	});
 
 	//2. Redraw map and panel based on new indiator
@@ -309,8 +317,8 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 		$('input[type="radio"][name="mapLevel"][value='+'2'+']').prop('checked',true)
 
 		//redraw map and bar chart
-		redrawMap(mapFile2, nutsData, 2, color, map, mapPath, defaultRegion);
-		redrawBarChart(nutsData, groups, defaultRegion, xScale, xAxis) //region is reset to the national level (so clicked or hovered regions are wiped)
+		redrawMap(mapFile2, nutsData, 2);
+		redrawBarChart(nutsData, groups, defaultRegion) //region is reset to the national level (so clicked or hovered regions are wiped)
     });
 
 	//3. Change tabs
@@ -338,19 +346,58 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 			nutsData = nutsDataNew
 
 			//redraw map and bar chart
-			redrawMap(mapFile, nutsData, 2, color, map, mapPath, defaultRegion);
-			redrawBarChart(nutsData, groups, defaultRegion, xScale, xAxis)
+			redrawMap(mapFile, nutsData, 2);
+			redrawBarChart(nutsData, groups, defaultRegion)
 		})
 	})
 
 	/*
 	#################################################
-	SECTION 3: THE DRAW MAP FUNCTION
-	To-Dos: 1. Play around with the projection to change the orientation of the map
-					2. Experiment with a new color scheme
+	SECTION : DEFINE MOUSEOVER FUNCTIONS
+	To-Dos: 1. Figure out a better cursor default for hover events
 	#################################################
 	*/
-	function drawMap(mapFile2, nutsData, color, map, mapPath){
+	// Mouse interactions on map
+	function mouseoverRegion(d) {
+		var hoverRegion = d.properties.adminLevel;
+		redrawBarChart(nutsData, groups, hoverRegion);
+		mapTip.show(d);
+		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', true).moveToFront();
+	}
+	function mouseoutRegion(d) {
+		var hoverRegion = d.properties.adminLevel;
+		redrawBarChart(nutsData, groups, defaultRegion);
+		mapTip.hide(d);
+		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', false);
+	}
+
+	// Mouse interactionS on bar chart
+	function mouseoverBar(d) {
+		mapFile = setMapFile(mapFile1, mapFile2, mapFile3);
+		redrawMap(mapFile, nutsData, d.groupID);
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'darkred'}).style('stroke-width', '4px')
+		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'brown'})
+		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'bold', 'font-size': '12px'})
+		document.getElementById('group').innerHTML = d.subGroup;
+		// d3.selectAll('.barText').filter(function(e) {return e.subGroup === d.subGroup}).style('font-weight', 'bold')
+	}
+	//
+	function mouseoutBar(d) {
+		redrawMap(mapFile, nutsData, 2);
+		d3.selectAll('.dots').filter(function(e) {return e.subGroup === d.subGroup}).style({stroke: 'darkblue'}).style('stroke-width', '2px')
+		d3.selectAll('.bar').filter(function(e) {return e.subGroup === d.subGroup}).style({fill: 'steelblue'})
+		d3.selectAll('.subCatLabel').filter(function(e) {return e.subGroup === d.subGroup}).style({'font-weight': 'normal', 'font-size': '11px'})
+		document.getElementById('group').innerHTML = "ALL";
+	}
+	/*
+	#################################################
+	SECTION 3.5: THE DRAW MAP FUNCTION
+	To-Dos: 1. Play around with the projection to change the orientation of the map
+					2. Experiment with a new color scheme
+					3. Change the map file to use the mapfile setti
+	#################################################
+	*/
+	function drawMap(mapFile2, nutsData){
 	  //Set the domains and ranges
 	  var filteredData = dataFilter(nutsData, true, 2) //mapOrPanel is set to trues
 	  var max = 100.01;
@@ -410,7 +457,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	To-Dos: 1: Prettify the legend by making it smaller
 	#################################################
 	*/
-	function drawMapLegend(color){
+	function drawMapLegend(){
 	  var legendContainerSize = d3.select('#legend').node().getBoundingClientRect()
 		var rectWidth = legendContainerSize.width/color.range().length
 	  var rectHeight = legendContainerSize.height/2;
@@ -456,7 +503,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 					2. Wrap and prettify the labels
 	#################################################
 	*/
-	function drawBarChart(nutsData, groups, panelMargin, panelWidth, panelHeight, panel, region, xScale, xAxis){
+	function drawBarChart(nutsData, groups, region){
 	  //Set the initial values and create the initial grouped dataset
 		var groupedData = groupData(nutsData, groups, region); //the default region is set to national ("TR") for panel view
 
@@ -474,22 +521,9 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	    .attr('transform', 'translate(0,'+ (panelHeight) + ")")
 	    .style('cursor', 'default')
 
-
-	  //Create the TOOLTIP
-	  // var barTip = d3.tip()
-	  //   .attr('class', 'd3-tip')
-	  //   .offset([0, 0])
-	  //     .direction('w')
-	  //     .html(function(e) {return "<strong>Name:</strong> <span style='color:silver'>" + e.subGroup + "</span>" + "<br>" +
-	  //       "<strong>Value:</strong> <span style='color:silver'>" + e.value + "</span>" })
-
 	  //Drawing the bar chart
 		/*Iterate through the main categories and use the count of subcategories to position the main category labels. The bar should look like it has distinct sections and should be easy to understand.*/
-	  var mainCategories = uniq_fast(groupedData.map(function(d) {return d.mainGroup})).sort()
-	  var barWidth = 16;
-	  var barPadding = 2;//padding between bars
-	  var categoryPadding = 10;//padding between the main category sections
-	  var mainCategoryPosition = 0; //the loop updates this value based on number of subCategories in previos
+	  var mainCategories = uniq_fast(groupedData.map(function(d) {return d.mainGroup})).sort();
 
 		mainCategories.forEach(function(d, i) {
 			var data = groupedData.filter(function(e) {return e.mainGroup === d})
@@ -519,9 +553,31 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 						y: function(e, j) {return j * (barWidth + barPadding) + mainCategoryPosition}, //
 						width: function(e){return xScale(e.value)},
 						height: barWidth
-					})
-					.on('mouseover', mouseoverBar)
-			    .on('mouseout', mouseoutBar);
+					});
+
+			// Draw the dots and labels for the bar
+			panel.append('g')
+					.selectAll('.dots')
+					.data(data)
+					.enter().append('circle')
+					.attr({
+						cx: function(e){return xScale(e.value) + barWidth/2 + barPadding},
+						cy: function(e, j) {return j * (barWidth + barPadding) + mainCategoryPosition + barWidth/2},
+						r: barWidth/2,
+						class: 'dots'
+					});
+
+			panel.append('g')
+					.selectAll('.barText')
+					.data(data)
+					.enter().append('text')
+					.text(function(e) {return e.value;})
+					.attr({
+						x: function(e){return xScale(e.value) + barWidth/2 + barPadding},
+						y: function(e, j) {return j * (barWidth + barPadding) + mainCategoryPosition + barWidth/2},
+						class: 'barText'
+					});
+
 			// Draw the labels
 			panel.append('g').selectAll('subCatLabel')
 					.data(data)
@@ -532,6 +588,21 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 						x: -5,
 						y: function(e, j){return mainCategoryPosition + j * (barWidth + barPadding)}
 					})
+
+			// Add invisible bars that cover the labels, the bars and the padding in between
+			panel.append('g')
+					.selectAll('.hoverRect')
+					.data(data)
+					.enter().append('rect')
+					.attr({
+						x: -panelMargin.left,
+						y: function(e, j) {return j * (barWidth + barPadding) + mainCategoryPosition}, //
+						width: function(e){return xScale(e.value) + panelMargin.left + barWidth},
+						height: barWidth + barPadding,
+						class: 'hoverRect'
+					})
+					.on('mouseover', mouseoverBar)
+			    .on('mouseout', mouseoutBar);
 
 			//update the main category position for next iteration with the height of the added bars
 			mainCategoryPosition += subCategories.length * (barWidth + barPadding) + categoryPadding
@@ -547,7 +618,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	To-Dos: 1. Make the axis data driven.
 	#################################################
 	*/
-	function redrawMap(mapFile, nutsData, groupID, color, map, mapPath){
+	function redrawMap(mapFile, nutsData, groupID){//color, map, mapPath
 	  filteredData = dataFilter(nutsData, true, groupID)
 
 	  var max = 100.01;
@@ -593,53 +664,36 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	To-Dos: 1. Make the axis data driven.
 	#################################################
 	*/
-	function redrawBarChart(nutsData, groups, region, xScale, xAxis){
+	function redrawBarChart(nutsData, groups, region){
 		//get the new data
-		var groupedData = groupData(nutsData, groups, region)
+		var groupedData = groupData(nutsData, groups, region);
 
 		//set the xScale and axis (Should be based on data)
 	  var maxValue = 100;
 	  var minValue = 0;
 		xScale.domain([minValue, maxValue]);
 		var numberTicks = Math.floor((maxValue - minValue)/15);
-	  xAxis.scale(xScale).ticks(numberTicks)
+	  xAxis.scale(xScale).ticks(numberTicks);
 
 		d3.selectAll('.bar')
 			.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
-			.attr('width',function(d) {return xScale(d.value)})
+			.attr('width',function(d) {return xScale(d.value)});
+
+		d3.selectAll('.dots')
+			.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
+			.attr('cx',function(d) {return xScale(d.value) + barWidth/2 + barPadding});
+
+		d3.selectAll('.barText')
+			.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
+			.text(function(d) {return d.value;})
+			.attr('x',function(d) {return xScale(d.value) + barWidth/2 + barPadding});
+
+		d3.selectAll('.hoverRect')
+			.data(groupedData, function(d) {return d.subGroup}) //use the subGroup value to match the bars
+			.attr('width',function(d) {return xScale(d.value) + panelMargin.left + barWidth})
 			.on('mouseover', mouseoverBar)
-			.on('mouseout', mouseoutBar);
+			.on('mouseout', mouseoutBar)
 	}
 
-	/*
-	#################################################
-	SECTION 7: DEFINE MOUSEOVER FUNCTIONS
-	To-Dos: 1.
-	#################################################
-	*/
-	// Mouse interactions on map
-	function mouseoverRegion(d) {
-		var hoverRegion = d.properties.adminLevel;
-		redrawBarChart(nutsData, groups, hoverRegion, xScale, xAxis)
-		mapTip.show(d)
-		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', true).moveToFront()
-	}
-	function mouseoutRegion(d) {
-		var hoverRegion = d.properties.adminLevel;
 
-		redrawBarChart(nutsData, groups, defaultRegion, xScale, xAxis)
-		mapTip.hide(d)
-		d3.select('.nuts-boundary#'+hoverRegion).classed('hover', false)//.classed('.nuts-boundary', true)
-	}
-
-	// Mouse interactionS on bar chart
-	function mouseoverBar(d) {
-		mapFile = setMapFile(mapFile1, mapFile2, mapFile3)
-		redrawMap(mapFile, nutsData, d.groupID, color, map, mapPath, defaultRegion)
-		// barTip.show(d)
-	}
-	//
-	function mouseoutBar(d) {
-		redrawMap(mapFile, nutsData, 2, color, map, mapPath, defaultRegion)
-	}
 }
