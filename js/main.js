@@ -359,8 +359,8 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 
 	/*
 	#################################################
-	SECTION : DEFINE MOUSEOVER FUNCTIONS
-	To-Dos: 1. Figure out a better cursor default for hover events
+	SECTION 3.4: DEFINE MOUSEOVER FUNCTIONS
+	To-Dos: 1.
 	#################################################
 	*/
 	// Mouse interactions on map
@@ -401,9 +401,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	/*
 	#################################################
 	SECTION 3.5: THE DRAW MAP FUNCTION
-	To-Dos: 1. Play around with the projection to change the orientation of the map
-					2. Experiment with a new color scheme
-					3. Change the range to data driven
+	To-Dos: 1.
 	#################################################
 	*/
 	function drawMap(mapFile, nutsData){
@@ -501,8 +499,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	/*
 	#################################################
 	SECTION 5: DRAWING THE BAR CHART
-	To-Dos: 1. Make the axis data driven.
-					2. Wrap and prettify the labels
+	To-Dos: 1.
 	#################################################
 	*/
 	function drawBarChart(nutsData, groups, region){
@@ -617,7 +614,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	/*
 	#################################################
 	SECTION 6: REDRAW THE MAP
-	To-Dos: 1. Make the axis data driven.
+	To-Dos: 1.
 	#################################################
 	*/
 	function redrawMap(mapFile, nutsData, groupID){//color, map, mapPath
@@ -667,7 +664,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	/*
 	#################################################
 	SECTION 6: REDRAW THE BAR CHART
-	To-Dos: 1. Make the axis data driven.
+	To-Dos: 1.
 	#################################################
 	*/
 	function redrawBarChart(nutsData, groups, region){
