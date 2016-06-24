@@ -225,7 +225,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
         height: mapHeight + mapMargin.top + mapMargin.bottom,
         width: mapWidth + mapMargin.left + mapMargin.right
       })
-      // .attr("id", "mapSvg")
+      .attr("id", "mapSvg")
       .append("g")
       .attr("transform", "translate(" + (mapMargin.left) + "," + (mapMargin.top)+ ")")//moving the origin to the point where it starts
 
@@ -259,6 +259,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 						height: legendContainerSize.height,
 						width: legendContainerSize.width
 					})
+		.attr("id", "legendSvg");
 	/*
 	#################################################
 	SECTION 3.2: SETTING UP THE GLOBAL VARIABLES AND DRAWING AREAS FOR THE BAR CHART
@@ -275,6 +276,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
         height: panelHeight + panelMargin.top + panelMargin.bottom,
         width: panelWidth + panelMargin.left + panelMargin.right
       })
+			.attr("id", "barSvg")
       .append('g')
       .attr("transform", "translate("+ panelMargin.left +"," + (panelMargin.top)+ ")");
 

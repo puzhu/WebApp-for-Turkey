@@ -59,14 +59,20 @@
 							<div id="mapContainer" class="row text-center">
 							</div>
 							<div id="legendAndButtons" class="row">
-								<div id="legend" class="col-xs-4">
+								<div id="legend" class="col-xs-3">
 								</div>
-								<div id="regionButtons" class="col-xs-8 text-center">
+								<div id="regionButtons" class="col-xs-5 text-center">
 									<form action="">
 										<input type="radio" name="mapLevel" value=1>Nuts 1
 										<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
 										<input type="radio" name="mapLevel" value=3>Nuts 3
 									</form>
+								</div>
+								<div class="col-xs-2">
+									<input id="saveMapButton" type="button" value="Save Map"/>
+								</div>
+								<div class="col-xs-2">
+									<input id="saveChartButton" type="button" value="Save Chart" />
 								</div>
 							</div>
 						</div>
@@ -84,25 +90,29 @@
 			</div>
 		</div>
 	</div>
-
+	<script src="libraries/jquery-2.2.4.min.js"></script>
+	<script src="libraries/d3/d3.min.js"></script>
+	<script src="libraries/d3/topojson.v1.min.js"></script>
+	<script src="libraries/d3/queue.v1.min.js"></script>
+	<script src="libraries/d3/d3.tip.v0.6.3.js"></script>
+	<script src="libraries/bootstrap.min.js"></script>
+	<script src="js/main.js"></script>
+	<script src="libraries/rgbcolor.js"></script>
+	<script src="libraries/canvg.js"></script>
+	<script src="libraries/svgenie.js"></script>
+	<script src="libraries/save-svg-as-png/saveSvgAsPng.js"></script>
+	<script src="js/downloadImage.js"></script>
 
 	<!-- Collapse small device menu on click -->
-	<script src="libraries/jquery-2.2.4.min.js"></script>
 	<script>
 		$(document).on('click','.navbar-collapse.in',function(e) {
 		if( $(e.target).is('a') && $(e.target).attr('class') != 'dropdown-toggle' ) {
-			console.log(this)
 				$(this).collapse('hide');
 		}
 		});
 	</script>
-	<script src="libraries/d3/d3.min.js"></script>
-	<script src="libraries/d3/topojson.v1.min.js"></script>
-	<script src="libraries/d3/queue.v1.min.js"></script>
-	<script src="libraries/jquery-2.2.4.min.js"></script>
-	<script src="libraries/d3/d3.tip.v0.6.3.js"></script>
-	<script src="libraries/bootstrap.min.js"></script>
-	<script src="js/main.js"></script>
+
+
 </body>
 <!-- <script src="scripts/main.js"></script> -->
 </html>
