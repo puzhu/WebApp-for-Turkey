@@ -4,18 +4,16 @@
 <head>
 <title>Turkey Survey Charts</title>
 <!-- <script src="libraries/bootstrap/js/bootstrap.min.js"></script> -->
-<link href="css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="css/bootstrap.min.css">
 <link rel="stylesheet" href="css/tool-tip-style.css">
 <link rel="stylesheet" href="css/main.css">
-<style>
-
-</style>
 </head>
 
 <body>
 	<div class="container-fluid" id='explainText'>
 		<h2>Visualization of enterprise survey data from Turkey</h2>
-		<p>This dashboard visualizes enterprise survey data that was collected during the period 2015-16. The data was collected to be representative, for each of the 108 indicators that are split between 13 topics, at the three regional levels (Nuts 1, Nut 2, and Nuts 3) and 18 sub-groups.</p>
+		<p>This dashboard visualizes enterprise survey data that was collected during the period 2015-16. The data was collected to be representative, for each of the 111 indicators that are split between 13 topics, at the three regional levels (Nuts 1, Nut 2, and Nuts 3) and 18 sub-groups.</p>
 		<p>Along with basic actions such as selecting, a new topic (tabs) or indicator (dropdown menu) or the different regional levels (Nuts 1, Nut 2, and Nuts 3), users can dive deep into this data by interacting with the charts. Hovering on a region on the map will trigger changes on the bar chart, which will show the split of the data between the different sub-groups for that particular region (instead of just aggregate estimates for all of Turkey). Similary, hovering over the bar chart will allow users to observe the regional variations for a particular sub-grouping, for instance, the percentage of female led firms that experience bribe payments across different regions</p>
 	</div>
 	<div class="container-fluid">
@@ -69,10 +67,12 @@
 									</form>
 								</div>
 								<div class="col-xs-2">
-									<input id="saveMapButton" type="button" value="Save Map"/>
+									<!-- <input id="saveMapButton" type="button" value="Save Map"/> -->
+									<button class="btn btn-sm btn-default" id="saveMapButton"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save Map</button>
 								</div>
 								<div class="col-xs-2">
-									<input id="saveChartButton" type="button" value="Save Chart" />
+									<!-- <input id="saveChartButton" type="button" value="Save Chart" /> -->
+									<button class="btn btn-sm btn-default" id="saveChartButton"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save Chart</button>
 								</div>
 							</div>
 						</div>
@@ -84,8 +84,15 @@
 
 							</div>
 						</div>
+
+					</div>
+					<div class ='row' id='chartNotes'>
+						<p class="text-muted">
+							Note: The dashboard is not suited for smaller devices like mobile phones. For best results, use a modern browser such as Chrome, Firefox or Safari instead of Internet Explorer and a medium to large sized viewing device (iPad or above). Also note that the charts cannot be saved on Internet Explorer.
+						</p>
 					</div>
 				</div>
+
 
 			</div>
 		</div>
@@ -97,9 +104,9 @@
 	<script src="libraries/d3/d3.tip.v0.6.3.js"></script>
 	<script src="libraries/bootstrap.min.js"></script>
 	<script src="js/main.js"></script>
-	<script src="libraries/rgbcolor.js"></script>
+	<!-- <script src="libraries/rgbcolor.js"></script>
 	<script src="libraries/canvg.js"></script>
-	<script src="libraries/svgenie.js"></script>
+	<script src="libraries/svgenie.js"></script> -->
 	<script src="libraries/save-svg-as-png/saveSvgAsPng.js"></script>
 	<script src="js/downloadImage.js"></script>
 
