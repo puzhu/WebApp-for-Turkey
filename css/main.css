@@ -52,6 +52,10 @@ body {
 /*Map Title CSS*/
 #explainText{
   padding-left: 30px;
+  padding-right: 30px;
+}
+#group, #nuts, #regionName{
+  color: rgb(4,90,141);
 }
 #allCharts {
   margin-top: -6px;
