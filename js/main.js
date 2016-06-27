@@ -210,7 +210,7 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
 	#################################################
 	*/
 	//Setting global plotting variables
-	var colorArray = ['rgb(241,238,246)','rgb(189,201,225)','rgb(116,169,207)','rgb(43,140,190)','rgb(4,90,141)'];
+	var colorArray = ['rgb(234,232,240)','rgb(189,201,225)','rgb(116,169,207)','rgb(43,140,190)','rgb(4,90,141)'];
 	var color = d3.scale.threshold()
 				.range(colorArray);
 
