@@ -82,22 +82,11 @@ body {
 }
 
 #mapContainer{
-  /*border: 1px solid blue;*/
-
   height: 400px;
 }
-
-#legendAndButtons{
-  /*border: 1px solid blue;*/
-}
-
 #panelContainer{
   margin-left: 40px;
   height: 480px;
-}
-/*Map Css*/
-.turkeyMap{
-  /*transition: fill 10000ms*/
 }
 
 /*Legend CSS*/

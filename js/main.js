@@ -230,9 +230,15 @@ function draw(mapFile1, mapFile2, mapFile3, nutsData, groups, indicatorList){
       .attr("transform", "translate(" + (mapMargin.left) + "," + (mapMargin.top)+ ")")//moving the origin to the point where it starts
 
 	//Set the map projection and call it
+	var mapScale;
+	if (window.innerWidth > 768){
+		mapScale = 750
+	} else{
+		mapScale = 500
+	}
   var mapProjection = d3.geo.mercator()
     .center([19.5,72.2])
-    .scale(750)
+    .scale(mapScale)
     .rotate([0,0,5.5])
     .translate([mapWidth/2, mapHeight/2]);
 

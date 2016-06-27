@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="css/main.css">
 </head>
 
-<body>
+<body onload="sizeChange()">
 	<div class="container-fluid" id='explainText'>
 		<h2>Visualization of enterprise survey data from Turkey</h2>
 		<p>This dashboard visualizes enterprise survey data that was collected during the period 2015-16. The data was collected to be representative, for each of the 111 indicators that are split between 13 topics, at the three regional levels (Nuts 1, Nut 2, and Nuts 3) and 18 sub-groups.</p>
@@ -57,21 +57,19 @@
 							<div id="mapContainer" class="row text-center">
 							</div>
 							<div id="legendAndButtons" class="row">
-								<div id="legend" class="col-xs-3">
+								<div id="legend" class="col-sm-3 text-center">
 								</div>
-								<div id="regionButtons" class="col-xs-5 text-center">
+								<div id="regionButtons" class="col-sm-5 text-center">
 									<form action="">
 										<input type="radio" name="mapLevel" value=1>Nuts 1
 										<input type="radio" name="mapLevel" value=2 checked="checked">Nuts 2
 										<input type="radio" name="mapLevel" value=3>Nuts 3
 									</form>
 								</div>
-								<div class="col-xs-2">
-									<!-- <input id="saveMapButton" type="button" value="Save Map"/> -->
+								<div class="col-sm-2 text-center">
 									<button class="btn btn-sm btn-default" id="saveMapButton"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save Map</button>
 								</div>
-								<div class="col-xs-2">
-									<!-- <input id="saveChartButton" type="button" value="Save Chart" /> -->
+								<div class="col-sm-2 text-center">
 									<button class="btn btn-sm btn-default" id="saveChartButton"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save Chart</button>
 								</div>
 							</div>
@@ -118,8 +116,17 @@
 		}
 		});
 	</script>
+	<script>
+		d3.select(window)
+	    		.on("resize", sizeChange)
+		function sizeChange() {
+			console.log(window.innerWidth)
+			if(window.innerWidth < 768){
+				d3.select("g").attr("transform", "scale(" + $("#mapContainer").width()/900 + ")");
+		    $("#mapSvg").height($("#mapContainer").width()*0.718);
+			}
 
-
+		}
+	</script>
 </body>
-<!-- <script src="scripts/main.js"></script> -->
 </html>
